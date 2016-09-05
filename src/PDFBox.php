@@ -22,6 +22,8 @@ namespace ImalH\PDFBox;
 class PDFBox{
 
     public static $MAX_RESOLUTION = 300;
+    public static $IMAGE_FORMAT_PNG = "PNG";
+    public static $IMAGE_FORMAT_JPEG = "JPEG";
     private $resolution = 0;
     private $jpeg_quality = 100;
     private $page_start = -1;
@@ -29,6 +31,9 @@ class PDFBox{
     private $pdf_path = "";
     private $output_path = "";
     private $number_of_pages = -1;
+    private $imageDeviceCommand = "";
+    private $imageExtention = "";
+    private $pngDownScaleFactor = "";
 
     private $is_os_win = null;
     private $gs_command = null;
@@ -37,7 +42,8 @@ class PDFBox{
     private $gs_path = null;
 
     public function __construct(){
-        $this->resolution = self::$MAX_RESOLUTION;
+        $this->setDPI(self::$MAX_RESOLUTION);
+        $this->setImageFormat(PDFBox::$IMAGE_FORMAT_JPEG);
         $this->initSystem();
         $gs_version = $this->getGSVersion();
         if($gs_version == -1){
@@ -69,6 +75,18 @@ class PDFBox{
         $this->resolution = $dpi;
     }
 
+    public function setImageFormat($imageformat,$pngScaleFactor = null){
+        if($imageformat == self::$IMAGE_FORMAT_JPEG){
+            $this->imageDeviceCommand = "jpeg";
+            $this->imageExtention="jpg";
+            $this->pngDownScaleFactor = isset($pngScaleFactor) ? "-dDownScaleFactor=".$pngScaleFactor : "";
+        }else if($imageformat == self::$IMAGE_FORMAT_PNG){
+            $this->imageDeviceCommand = "png16m";
+            $this->imageExtention="png";
+            $this->pngDownScaleFactor = "";
+        }
+    }
+
     public function getNumberOfPages(){
         if($this->number_of_pages == -1){
             $pages = $this->executeGS('-q -dNODISPLAY -c "("'.$this->pdf_path.'") (r) file runpdfbegin pdfpagecount = quit"',true);
@@ -95,12 +113,12 @@ class PDFBox{
         if(!($this->jpeg_quality >= 1 && $this->jpeg_quality <= 100)){
             $this->jpeg_quality = 100;
         }
-        $image_path = $this->output_path."/page-%d.jpg";
-        $output = $this->executeGS("-dSAFER -dBATCH -dNOPAUSE -sDEVICE=jpeg -r".$this->resolution." -dNumRenderingThreads=4 -dFirstPage=".$this->page_start." -dLastPage=".$this->page_end." -o\"".$image_path."\" -dJPEGQ=".$this->jpeg_quality." -q \"".($this->pdf_path)."\" -c quit");
+        $image_path = $this->output_path."/page-%d.".$this->imageExtention;
+        $output = $this->executeGS("-dSAFER -dBATCH -dNOPAUSE -sDEVICE=".$this->imageDeviceCommand." ".$this->pngDownScaleFactor." -r".$this->resolution." -dNumRenderingThreads=4 -dFirstPage=".$this->page_start." -dLastPage=".$this->page_end." -o\"".$image_path."\" -dJPEGQ=".$this->jpeg_quality." -q \"".($this->pdf_path)."\" -c quit");
 
         $fileArray = [];
         for($i=($this->page_start); $i<=$this->page_end; ++$i){
-            $fileArray[] = "page-$i.jpg";
+            $fileArray[] = "page-$i.".$this->imageExtention;
         }
 
         if(!$this->checkFilesExists($this->output_path,$fileArray)){
