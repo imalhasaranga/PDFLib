@@ -3,6 +3,11 @@ PDFBox is Currently the fastest Php wrapper enables you to interact with PDFs, C
 
 This project was done by a sofware company called Treinetic (Pvt) Ltd, Sri Lanka. You will find more info about us and what we do [on our website](http://www.treinetic.com).
 
+![Issues](https://img.shields.io/github/issues/imalhasaranga/PDFBox.svg)
+[![Software License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+![Forks](https://img.shields.io/github/forks/imalhasaranga/PDFBox.svg)
+
+
 ## Requirements
 
 You should have [Ghostscript](http://www.ghostscript.com/) installed and configured.
@@ -11,7 +16,7 @@ You should have [Ghostscript](http://www.ghostscript.com/) installed and configu
 
 The package can be installed via composer:
 ``` bash
-$ composer require ImalH/PDFBox
+$ composer require imal-h/pdf-box
 ```
 
 ## Usage
