@@ -9,10 +9,6 @@ You should have [Ghostscript](http://www.ghostscript.com/) installed and configu
 
 ## Install
 
-The package can be installed via composer:
-``` bash
-$ composer require spatie/pdf-to-image
-```
 
 ## Usage
 
