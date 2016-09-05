@@ -1,5 +1,5 @@
 {
-    "name": "ImalH/PDFBox",
+    "name": "imal-h/pdf-box",
     "description": "PDFBox is Currently the fastest Php wrapper enables you to interact with PDFs, Current Release provide you methods to convert PDF to Images as well as Images to PDF, future releases will included more functions to interact with PDF files",
     "keywords": [
         "Imal hasaranga",
