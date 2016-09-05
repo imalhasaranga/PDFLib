@@ -1,0 +1,40 @@
+{
+    "name": "ImalH/PDFBox",
+    "description": "PDFBox is Currently the fastest Php wrapper enables you to interact with PDFs, Current Release provide you methods to convert PDF to Images as well as Images to PDF, future releases will included more functions to interact with PDF files",
+    "keywords": [
+        "Imal hasaranga",
+        "PDFbox for Php",
+        "pdf to images",
+        "images to pdf",
+        "convert",
+        "php wrapper",
+        "GhostScript"
+    ],
+    "homepage": "https://github.com/imalhasaranga/PDFBox.git",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Imal hasaranga Perera",
+            "email": "imal.hasaranga@gmail.com",
+            "homepage": "http://www.treinetic.com",
+            "role": "CEO"
+        }
+    ],
+    "require": {
+        "php" : ">=5.5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit" : "4.*",
+        "scrutinizer/ocular": "~1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "ImalH\\PDFBox\\": "src"
+        }
+    },
+    "autoload-dev": {
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}
