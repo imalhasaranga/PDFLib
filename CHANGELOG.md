@@ -1,6 +1,9 @@
 # Changelog
 
-All Significant changes to `PDFBox` will be documented in here
+All Significant changes to `PDFlib` will be documented in here
+
+### Project Renamed to PDFBox to PDFlib
+- an issue opend, requesting to rename it
 
 ### PNG support added
 - setImageFormat() function added allowing output format to be set
