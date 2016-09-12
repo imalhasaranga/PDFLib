@@ -1,16 +1,16 @@
 {
-    "name": "imal-h/pdf-box",
-    "description": "Current Release of PDFBox provide you methods to convert PDF to Images as well as Images to PDF.",
+    "name": "imal-h/pdflib",
+    "description": "Current Release of PDFlib provide you methods to convert PDF to Images as well as Images to PDF.",
     "keywords": [
         "Imal hasaranga",
-        "PDFbox for Php",
+        "PDFlib for Php",
         "pdf to images",
         "images to pdf",
         "convert",
         "php wrapper",
         "GhostScript"
     ],
-    "homepage": "https://github.com/imalhasaranga/PDFBox.git",
+    "homepage": "https://github.com/imalhasaranga/PDFLib.git",
     "license": "MIT",
     "authors": [
         {
@@ -29,7 +29,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ImalH\\PDFBox\\": "src"
+            "ImalH\\PDFLib\\": "src"
         }
     },
     "autoload-dev": {

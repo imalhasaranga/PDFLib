@@ -16,10 +16,10 @@
 
 */
 
-namespace ImalH\PDFBox;
+namespace ImalH\PDFLib;
 
 
-class PDFBox{
+class PDFLib{
 
     public static $MAX_RESOLUTION = 300;
     public static $IMAGE_FORMAT_PNG = "PNG";

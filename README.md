@@ -1,5 +1,5 @@
-# PDFBox
-PDFBox is a project which enables you to interact with PDFs, Current Release provide you methods to convert PDF to Images as well as Images to PDF, future releases will included more functions to interact with PDF files
+# PDFlib
+PDFlib is a project which enables you to interact with PDFs, Current Release provide you methods to convert PDF to Images as well as Images to PDF, future releases will included more functions to interact with PDF files
 
 This project was done by a sofware company called Treinetic (Pvt) Ltd, Sri Lanka. You will find more info about us and what we do [on our website](http://www.treinetic.com).
 
@@ -25,13 +25,13 @@ Converting a PDF to set of Images.
 
 ```php
 
-$pdfBox = new ImalH\PDFBox\PDFBox();
-$pdfBox->setPdfPath($pdf_file_path);
-$pdfBox->setOutputPath($folder_path_for_images);
-$pdfBox->setImageQuality(95);
-$pdfBox->setDPI(300);
-$pdfBox->setPageRange(1,$pdfBox->getNumberOfPages());
-$pdfBox->convert();
+$pdflib = new ImalH\PDFLib\PDFLib();
+$pdflib->setPdfPath($pdf_file_path);
+$pdflib->setOutputPath($folder_path_for_images);
+$pdflib->setImageQuality(95);
+$pdflib->setDPI(300);
+$pdflib->setPageRange(1,$pdflib->getNumberOfPages());
+$pdflib->convert();
 
 ```
 
@@ -39,9 +39,9 @@ Making a PDF from set of Images
 
 ```php
 
-$pdfBox = new ImalH\PDFBox\PDFBox();
+$pdflib = new ImalH\PDFLib\PDFLib();
 $imagePaths = ["images-1.jpg","images-2.jpg"];
-$pdfBox->makePDF($destination_pdf_file_path,$imagePaths);
+$pdflib->makePDF($destination_pdf_file_path,$imagePaths);
 
 ```
 
