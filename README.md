@@ -55,7 +55,12 @@ $pdfBox->getNumberOfPages(); //returns the number of pages in the pdf
 $pdfBox->setPageRange(1,2); // allows you to convert only few pages in the PDF Document
 $pdfBox->setImageQuality(95); // allows you to tell the quality you expect in the output Jpg file (only jpg)
 $pdfBox->setDPI(300); //setting the DPI (Dots per inch) of output files
-$pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG,);   //this will set the output image format, default it is jpg, but I recommend using pdf to png because it seems it is faster
+$pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG,$dDownScaleFactor=null);   //this will set the output image format, default it is jpg, but I recommend using pdf to png because it seems it is faster
+
+$dDownScaleFactor=integer
+This causes the internal rendering to be scaled down by the given (integer <= 8) factor before being output. For example, the following will produce a 200dpi output png from a 600dpi internal rendering:
+    gs -sDEVICE=png16m -r600 -dDownScaleFactor=3 -o tiger.png\examples/tiger.png
+    http://ghostscript.com/doc/current/Devices.htm
 
 ```
 
