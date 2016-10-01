@@ -24,16 +24,16 @@ class PDFLib{
     public static $MAX_RESOLUTION = 300;
     public static $IMAGE_FORMAT_PNG = "PNG";
     public static $IMAGE_FORMAT_JPEG = "JPEG";
-    private $resolution = 0;
-    private $jpeg_quality = 100;
-    private $page_start = -1;
-    private $page_end = -1;
-    private $pdf_path = "";
-    private $output_path = "";
-    private $number_of_pages = -1;
-    private $imageDeviceCommand = "";
-    private $imageExtention = "";
-    private $pngDownScaleFactor = "";
+    private $resolution;
+    private $jpeg_quality;
+    private $page_start;
+    private $page_end;
+    private $pdf_path;
+    private $output_path;
+    private $number_of_pages;
+    private $imageDeviceCommand;
+    private $imageExtention;
+    private $pngDownScaleFactor;
 
     private $is_os_win = null;
     private $gs_command = null;
@@ -42,14 +42,26 @@ class PDFLib{
     private $gs_path = null;
 
     public function __construct(){
+
+        $this->resolution = 0;
+        $this->jpeg_quality = 100;
+        $this->page_start = -1;
+        $this->page_end = -1;
+        $this->pdf_path = "";
+        $this->output_path = "";
+        $this->number_of_pages = -1;
+        $this->imageDeviceCommand = "";
+        $this->imageExtention = "";
+        $this->pngDownScaleFactor = "";
+
         $this->setDPI(self::$MAX_RESOLUTION);
-        $this->setImageFormat(PDFBox::$IMAGE_FORMAT_JPEG);
+        $this->setImageFormat(self::$IMAGE_FORMAT_JPEG);
         $this->initSystem();
         $gs_version = $this->getGSVersion();
         if($gs_version == -1){
-            throw new \Exception("Unable to find GhostScript instalation",1);
+            throw new \Exception("Unable to find GhostScript instalation",404);
         }else if($gs_version < 9.16){
-            throw new \Exception("Your version of GhostScript $gs_version is not compatible with  the library", 1);
+            throw new \Exception("Your version of GhostScript $gs_version is not compatible with  the library", 403);
         }
     }
 
@@ -137,7 +149,7 @@ class PDFLib{
         $command = '-dBATCH -dNOPAUSE -sDEVICE=pdfwrite -o"'.$ouput_path_pdf_name.'" "'.$psfile.'" -c "'.$imagesources.'"';
         $command_results = $this->executeGS($command);
         if(!$this->checkFilesExists("",[$ouput_path_pdf_name])){
-            throw new \Exception("Unable to make PDF : ".$command_results[2]);
+            throw new \Exception("Unable to make PDF : ".$command_results[2],500);
         }
     }
 
@@ -177,6 +189,8 @@ class PDFLib{
             }
         }
     }
+
+
 
     private function execute($command, $is_shell = false){
         $output = null;

@@ -28,7 +28,7 @@ Converting a PDF to set of Images.
 $pdflib = new ImalH\PDFLib\PDFLib();
 $pdflib->setPdfPath($pdf_file_path);
 $pdflib->setOutputPath($folder_path_for_images);
-$pdflib->setImageQuality(95);
+$pdflib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG);
 $pdflib->setDPI(300);
 $pdflib->setPageRange(1,$pdflib->getNumberOfPages());
 $pdflib->convert();
@@ -53,8 +53,9 @@ You can get the total number of pages in the pdf:
 
 $pdfBox->getNumberOfPages(); //returns the number of pages in the pdf
 $pdfBox->setPageRange(1,2); // allows you to convert only few pages in the PDF Document
-$pdfBox->setImageQuality(95); // allows you to tell the quality you expect in the output Jpg file
+$pdfBox->setImageQuality(95); // allows you to tell the quality you expect in the output Jpg file (only jpg)
 $pdfBox->setDPI(300); //setting the DPI (Dots per inch) of output files
+$pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG,);   this will set the output image format, default it is jpg, but I recommend using pdf to png because it seems it is faster
 
 ```
 
