@@ -55,7 +55,7 @@ $pdfBox->getNumberOfPages(); //returns the number of pages in the pdf
 $pdfBox->setPageRange(1,2); // allows you to convert only few pages in the PDF Document
 $pdfBox->setImageQuality(95); // allows you to tell the quality you expect in the output Jpg file (only jpg)
 $pdfBox->setDPI(300); //setting the DPI (Dots per inch) of output files
-$pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG,);   this will set the output image format, default it is jpg, but I recommend using pdf to png because it seems it is faster
+$pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG,);   //this will set the output image format, default it is jpg, but I recommend using pdf to png because it seems it is faster
 
 ```
 
