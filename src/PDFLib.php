@@ -129,10 +129,9 @@ class PDFLib{
         $output = $this->executeGS("-dSAFER -dBATCH -dNOPAUSE -sDEVICE=".$this->imageDeviceCommand." ".$this->pngDownScaleFactor." -r".$this->resolution." -dNumRenderingThreads=4 -dFirstPage=".$this->page_start." -dLastPage=".$this->page_end." -o\"".$image_path."\" -dJPEGQ=".$this->jpeg_quality." -q \"".($this->pdf_path)."\" -c quit");
 
         $fileArray = [];
-        for($i=($this->page_start); $i<=$this->page_end; ++$i){
+        for($i=1; $i<=($this->page_end - $this->page_start + 1); ++$i){
             $fileArray[] = "page-$i.".$this->imageExtention;
         }
-
         if(!$this->checkFilesExists($this->output_path,$fileArray)){
             $errrorinfo = implode(",", $output);
             throw new \Exception('PDF_CONVERSION_ERROR '.$errrorinfo);
