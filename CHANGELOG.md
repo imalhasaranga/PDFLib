@@ -2,6 +2,12 @@
 
 All Significant changes to `PDFlib` will be documented in here
 
+### Page Range Conversion Bug Fix
+- there was a issue in the page range conversion, this was resolved by a help of a pull requests, and added test cases
+- convert() method will now return the converted image names
+
+## 1.2.0 - 2016-09-05
+
 ### Project Renamed to PDFBox to PDFlib
 - an issue opend, requesting to rename it
 

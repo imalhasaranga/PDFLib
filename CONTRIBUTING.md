@@ -22,3 +22,10 @@ We accept contributions via Pull Requests on [Github](https://github.com/imalhas
 - **Send coherent history** - Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please [squash them](http://www.git-scm.com/book/en/v2/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages) before submitting.
 
 
+## Tests
+
+- Make sure to run the and see all of them are pssing before sumbitting a pull requests
+
+### How to run Tests ? 
+    composer install
+    vendor/bin/phpunit
