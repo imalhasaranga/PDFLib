@@ -136,7 +136,7 @@ class PDFLib{
             $errrorinfo = implode(",", $output);
             throw new \Exception('PDF_CONVERSION_ERROR '.$errrorinfo);
         }
-
+        return $fileArray;
     }
 
     public function makePDF($ouput_path_pdf_name, $imagePathArray){
@@ -206,8 +206,8 @@ class PDFLib{
     }
 
     private function checkFilesExists($source_path,$fileNameArray){
+        $source_path = trim($source_path) == "" ? $source_path : $source_path."/";
         foreach ($fileNameArray as $file_name) {
-            $source_path = trim($source_path) == "" ? $source_path : $source_path."/";
             if(!file_exists($source_path.$file_name)){
                 return false;
             }
