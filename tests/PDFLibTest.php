@@ -27,44 +27,94 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         self::assertTrue($pagesCount == self::$_SAMPLE_PDF_PAGES);
     }
 
-//    public function testConvertToPng(){
-//        self::clean();
-//        $pdfLib = new \ImalH\PDFLib\PDFLib();
-//        $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
-//        $pdfLib->setOutputPath(self::$_DATA_FOLDER);
-//        $pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG);
-//        $pdfLib->setDPI(300);
-//        $filesArray = $pdfLib->convert();
-//        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"page-");
-//        self::assertTrue($fileCount == self::$_SAMPLE_PDF_PAGES);
-//    }
-
-//    public function testConvertToJPG(){
-//        self::clean();
-//        $pdfLib = new \ImalH\PDFLib\PDFLib();
-//        $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
-//        $pdfLib->setOutputPath(self::$_DATA_FOLDER);
-//        $pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_JPEG);
-//        $pdfLib->setDPI(300);
-//        $pdfLib->setImageQuality(95);
-//        $filesArray = $pdfLib->convert();
-//        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"page-");
-//        self::assertTrue($fileCount == self::$_SAMPLE_PDF_PAGES);
-//    }
-
-    public function testConversionOfRangePNG(){
+    public function testConvertToPng(){
         self::clean();
         $pdfLib = new \ImalH\PDFLib\PDFLib();
         $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
         $pdfLib->setOutputPath(self::$_DATA_FOLDER);
         $pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG);
         $pdfLib->setDPI(300);
-        $pdfLib->setPageRange(2,4);
         $filesArray = $pdfLib->convert();
-        var_dump($filesArray);
         $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"page-");
-        self::assertTrue($fileCount ==  count($filesArray) );
+        self::assertTrue($fileCount == self::$_SAMPLE_PDF_PAGES);
     }
+
+    public function testConvertToJPG(){
+        self::clean();
+        $pdfLib = new \ImalH\PDFLib\PDFLib();
+        $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
+        $pdfLib->setOutputPath(self::$_DATA_FOLDER);
+        $pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_JPEG);
+        $pdfLib->setDPI(300);
+        $pdfLib->setImageQuality(95);
+        $filesArray = $pdfLib->convert();
+        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"page-");
+        self::assertTrue($fileCount == self::$_SAMPLE_PDF_PAGES);
+    }
+
+    public function testConversionOfRangePNG()
+    {
+        self::clean();
+        $pdfLib = new \ImalH\PDFLib\PDFLib();
+        $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
+        $pdfLib->setOutputPath(self::$_DATA_FOLDER);
+        $pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG);
+        $pdfLib->setDPI(300);
+        $pdfLib->setPageRange(2, 4);
+        $filesArray = $pdfLib->convert();
+        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER, "page-");
+        self::assertTrue($fileCount == count($filesArray));
+    }
+
+    public function testConversionOfRangeJPG()
+    {
+        self::clean();
+        $pdfLib = new \ImalH\PDFLib\PDFLib();
+        $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
+        $pdfLib->setOutputPath(self::$_DATA_FOLDER);
+        $pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_JPEG);
+        $pdfLib->setDPI(300);
+        $pdfLib->setImageQuality(95);
+        $pdfLib->setPageRange(2, 4);
+        $filesArray = $pdfLib->convert();
+        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER, "page-");
+        self::assertTrue($fileCount == count($filesArray));
+    }
+
+    public function testImageToPdf(){
+        self::clean();
+        $pdfLib = new \ImalH\PDFLib\PDFLib();
+        $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
+        $pdfLib->setOutputPath(self::$_DATA_FOLDER);
+        $pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_JPEG);
+        $pdfLib->setDPI(300);
+        $pdfLib->setImageQuality(95);
+        $pdfLib->setPageRange(2, 4);
+        $filesArray = $pdfLib->convert();
+        $fullpaths = [];
+        foreach ($filesArray as $item){
+            $fullpaths[] = self::$_DATA_FOLDER."/".$item;
+        }
+        $pdfFileName = self::$_DATA_FOLDER."/from_images.pdf";
+        if(file_exists($pdfFileName)){
+            unlink($pdfFileName);
+        }
+        $pdfLib->makePDF($pdfFileName,$fullpaths);
+
+        $pdfLib = new \ImalH\PDFLib\PDFLib();
+        $pdfLib->setPdfPath($pdfFileName);
+        self::assertTrue($pdfLib->getNumberOfPages() == count($fullpaths));
+    }
+
+
+
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+        self::clean();
+    }
+
+    /*------------------------ helper functions below ----------------------------*/
 
     private static function clean()
     {
@@ -75,8 +125,9 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         mkdir("./" . self::$_DATA_FOLDER);
     }
 
-    private static function deleteDir($dirPath) {
-        if (! is_dir($dirPath)) {
+    private static function deleteDir($dirPath)
+    {
+        if (!is_dir($dirPath)) {
             throw new InvalidArgumentException("$dirPath must be a directory");
         }
         if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
@@ -93,12 +144,13 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         rmdir($dirPath);
     }
 
-    private static function countFilesNameStartsWith($dir_path,$name){
+    private static function countFilesNameStartsWith($dir_path, $name)
+    {
         $counter = 0;
         $dir = new DirectoryIterator($dir_path);
         foreach ($dir as $fileinfo) {
             if (!$fileinfo->isDot()) {
-                if(strpos($fileinfo->getFilename(),$name) !== false){
+                if (strpos($fileinfo->getFilename(), $name) !== false) {
                     ++$counter;
                 }
             }
