@@ -34,6 +34,7 @@ class PDFLib{
     private $imageDeviceCommand;
     private $imageExtention;
     private $pngDownScaleFactor;
+    private $convertOptions = array();
 
     private $is_os_win = null;
     private $gs_command = null;
@@ -53,6 +54,7 @@ class PDFLib{
         $this->imageDeviceCommand = "";
         $this->imageExtention = "";
         $this->pngDownScaleFactor = "";
+        $this->convertOptions = array(array("NumRenderingThreads", 4));
 
         $this->setDPI(self::$MAX_RESOLUTION);
         $this->setImageFormat(self::$IMAGE_FORMAT_JPEG);
@@ -99,6 +101,27 @@ class PDFLib{
         }
     }
 
+    public function setConvertOption($name, $token) {
+      $this->unsetConvertOption($name);
+      $this->convertOptions[] = array($name, $token);
+    }
+
+    public function unsetConvertOption($name) {
+      foreach ($this->convertOptions as $key => $nametoken) {
+        if ($nametoken[0] == $name) {
+          unset($this->convertOptions[$key]);
+        }
+      }
+    }
+
+    protected function getConvertOptionsString() {
+      $options = array();
+      foreach ($this->convertOptions as $nametoken) {
+        $options[] = "-d$nametoken[0]=$nametoken[1]";
+      }
+      return implode(" ", $options);
+    }
+
     public function getNumberOfPages(){
         if($this->number_of_pages == -1){
             $pages = $this->executeGS('-q -dNODISPLAY -c "("'.$this->pdf_path.'") (r) file runpdfbegin pdfpagecount = quit"',true);
@@ -126,7 +149,7 @@ class PDFLib{
             $this->jpeg_quality = 100;
         }
         $image_path = $this->output_path."/page-%d.".$this->imageExtention;
-        $output = $this->executeGS("-dSAFER -dBATCH -dNOPAUSE -sDEVICE=".$this->imageDeviceCommand." ".$this->pngDownScaleFactor." -r".$this->resolution." -dNumRenderingThreads=4 -dFirstPage=".$this->page_start." -dLastPage=".$this->page_end." -o\"".$image_path."\" -dJPEGQ=".$this->jpeg_quality." -q \"".($this->pdf_path)."\" -c quit");
+        $output = $this->executeGS("-dSAFER -dBATCH -dNOPAUSE -sDEVICE=".$this->imageDeviceCommand." ".$this->pngDownScaleFactor." -r".$this->resolution." ".$this->getConvertOptionsString()." -dFirstPage=".$this->page_start." -dLastPage=".$this->page_end." -o\"".$image_path."\" -dJPEGQ=".$this->jpeg_quality." -q \"".($this->pdf_path)."\" -c quit");
 
         $fileArray = [];
         for($i=1; $i<=($this->page_end - $this->page_start + 1); ++$i){
