@@ -11,7 +11,7 @@ contact us via info@treinetic.com and get your project done by the experts.
 
 ## Requirements
 
-You should have [Ghostscript](http://www.ghostscript.com/) installed and configured.
+You should have [Ghostscript](http://www.ghostscript.com/) >= 9.16 installed and configured.
 
 ## Install
 
