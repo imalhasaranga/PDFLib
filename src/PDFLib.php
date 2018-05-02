@@ -101,7 +101,7 @@ class PDFLib{
 
     public function getNumberOfPages(){
         if($this->number_of_pages == -1){
-            $pages = $this->executeGS('-q -dNODISPLAY -c "("'.$this->pdf_path.'") (r) file runpdfbegin pdfpagecount = quit"',true);
+            $pages = $this->executeGS('-q -dNODISPLAY -c "('.$this->pdf_path.') (r) file runpdfbegin pdfpagecount = quit"',true);
             $this->number_of_pages = intval($pages);
         }
         return $this->number_of_pages;
