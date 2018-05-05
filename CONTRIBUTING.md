@@ -24,7 +24,7 @@ We accept contributions via Pull Requests on [Github](https://github.com/imalhas
 
 ## Tests
 
-- Make sure to run the and see all of them are pssing before sumbitting a pull requests
+- Make sure to run all the tests and see all of them are pssing before sumbitting a pull requests
 
 ### How to run Tests ? 
     composer install

@@ -75,6 +75,16 @@ Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recen
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
+
+## Tests
+
+- Make sure to run all the tests and see all of them are pssing before sumbitting a pull requests
+
+### How to run Tests ? 
+    composer install
+    vendor/bin/phpunit
+
+
 ## Credits
 
 - [Imal Hasaranga Perera](https://github.com/imalhasaranga)
