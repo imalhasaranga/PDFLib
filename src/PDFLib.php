@@ -101,6 +101,9 @@ class PDFLib{
 
     public function getNumberOfPages(){
         if($this->number_of_pages == -1){
+            if($this->gs_command == "gswin32c.exe" || $this->gs_command == "gswin64c.exe"){
+                $this->pdf_path = str_replace('\\', '/', $this->pdf_path);
+            }
             $pages = $this->executeGS('-q -dNODISPLAY -c "('.$this->pdf_path.') (r) file runpdfbegin pdfpagecount = quit"',true);
             $this->number_of_pages = intval($pages);
         }
@@ -142,6 +145,9 @@ class PDFLib{
     public function makePDF($ouput_path_pdf_name, $imagePathArray){
         $imagesources ="";
         foreach ($imagePathArray as $singleImage) {
+            if($this->gs_command == "gswin32c.exe" || $this->gs_command == "gswin64c.exe") {
+                $singleImage = str_replace('\\', '/', $singleImage);
+            }
             $imagesources .= '('.$singleImage.')  viewJPEG showpage ';
         }
         $psfile  = $this->getGSLibFilePath("viewjpeg.ps");
