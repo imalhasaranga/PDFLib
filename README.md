@@ -22,7 +22,7 @@ $ composer require imal-h/pdf-box
 
 ## Usage
 
-Converting a PDF to set of Images.
+Converting a PDF to set of images.
 
 ```php
 
@@ -36,7 +36,7 @@ $pdflib->convert();
 
 ```
 
-Making a PDF from set of Images
+Making a PDF from set of images
 
 ```php
 
@@ -48,7 +48,7 @@ $pdflib->makePDF($destination_pdf_file_path,$imagePaths);
 
 If in anycase code throws '**** Unable to open the initial device, quitting.' this type of error that means program can't create temporary files because of a permission problem, this error only comes in the Linux or Mac Oparating systems so Please check the apache log and provide necessay permissions
 
-## Other Usefull Methods
+## Other useful methods
 You can get the total number of pages in the pdf:
 ```php
 
@@ -67,7 +67,7 @@ Read More : http://ghostscript.com/doc/current/Devices.htm
 */
 ```
 
-## Change log
+## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
 
