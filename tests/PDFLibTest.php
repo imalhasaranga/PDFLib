@@ -27,6 +27,21 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         self::assertTrue($pagesCount == self::$_SAMPLE_PDF_PAGES);
     }
 
+    public function testConvertWithChaining(){
+        self::clean();
+        $filesArray = (new \ImalH\PDFLib\PDFLib())
+            ->setPdfPath(self::$_SAMPLE_PDF)
+            ->setOutputPath(self::$_DATA_FOLDER)
+            ->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG)
+            ->setDPI(300)
+            ->setFilePrefix('custom')
+            ->convert()
+            ;
+        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"custom");
+        self::assertSame($fileCount, self::$_SAMPLE_PDF_PAGES);
+    }
+
+
     public function testConvertToPngWithCustomPrefix(){
         self::clean();
         $pdfLib = new \ImalH\PDFLib\PDFLib();

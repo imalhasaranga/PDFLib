@@ -66,36 +66,75 @@ class PDFLib{
         }
     }
 
+    /**
+     * Set the path to the PDF file to process
+     * @param string $pdf_path
+     * @return self
+     */
     public function setPdfPath($pdf_path){
         $this->pdf_path = $pdf_path;
         $this->number_of_pages = -1;
+        return $this;
     }
 
+    /**
+     * Set the output path to where to store the generated files
+     * @param string $output_path
+     * @return self
+     */
     public function setOutputPath($output_path){
         $this->output_path= $output_path;
+        return $this;
     }
 
+    /**
+     * Change the generated JPG quality from the default of 100
+     * @param integer $jpeg_quality
+     * @return self
+     */
     public function setImageQuality($jpeg_quality){
         $this->jpeg_quality = $jpeg_quality;
+        return $this;
     }
 
+    /**
+     * Set a start and end page to process.
+     * @param integer $start
+     * @param integer $end
+     * @return self
+     */
     public function setPageRange($start, $end){
         $this->page_start = $start;
         $this->page_end = $end;
+        return $this;
     }
 
+    /**
+     * Change the resolution of the output file from the default 300dpi
+     * @param integer $end
+     * @return self
+     */
     public function setDPI($dpi){
         $this->resolution = $dpi;
+        return $this;
     }
 
     /**
      * Change the default file prefix from "page-" to something else
      * @param string $fileprefix
+     * @return self
      */
     public function setFilePrefix($fileprefix){
         $this->file_prefix = $fileprefix;
+        return $this;
     }
 
+    /**
+     * Change the image format to PNG or JPEG
+     * @param string $imageformat
+     * @param float $pngScaleFactor
+     * @return self
+     */
     public function setImageFormat($imageformat,$pngScaleFactor = null){
         if($imageformat == self::$IMAGE_FORMAT_JPEG){
             $this->imageDeviceCommand = "jpeg";
@@ -106,6 +145,7 @@ class PDFLib{
             $this->imageExtention="png";
             $this->pngDownScaleFactor = "";
         }
+        return $this;
     }
 
     public function getNumberOfPages(){
