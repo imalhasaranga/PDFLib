@@ -237,7 +237,7 @@ class PDFLib{
                 if(!((is_array($output) && (strpos($output[0], 'is not recognized as an internal or external command') !== false)) || !is_array($output) && trim($output) == "")){
                     $this->gs_command = "gs";
                     $this->gs_version = doubleval($output[0]);
-                    $this->gs_path = "/usr/local/share/ghostscript/".$this->gs_version;
+                    $this->gs_path = ""; // The ghostscript will find the path itself
                     $this->gs_is_64 = "NOT WIN";
                 }
             }
@@ -271,6 +271,9 @@ class PDFLib{
     }
 
     private function getGSLibFilePath($filename){
+        if(!$this->gs_path){
+            return $filename;
+        }
         if($this->is_os_win){
             return $this->gs_path."\\lib\\$filename";
         }else{
