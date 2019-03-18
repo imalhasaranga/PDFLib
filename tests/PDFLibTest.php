@@ -27,6 +27,19 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         self::assertTrue($pagesCount == self::$_SAMPLE_PDF_PAGES);
     }
 
+    public function testConvertToPngWithCustomPrefix(){
+        self::clean();
+        $pdfLib = new \ImalH\PDFLib\PDFLib();
+        $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
+        $pdfLib->setOutputPath(self::$_DATA_FOLDER);
+        $pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG);
+        $pdfLib->setDPI(300);
+        $pdfLib->setFilePrefix('custom');
+        $filesArray = $pdfLib->convert();
+        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"custom");
+        self::assertSame($fileCount, self::$_SAMPLE_PDF_PAGES);
+    }
+
     public function testConvertToPng(){
         self::clean();
         $pdfLib = new \ImalH\PDFLib\PDFLib();
@@ -36,7 +49,7 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         $pdfLib->setDPI(300);
         $filesArray = $pdfLib->convert();
         $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"page-");
-        self::assertTrue($fileCount == self::$_SAMPLE_PDF_PAGES);
+        self::assertSame($fileCount, self::$_SAMPLE_PDF_PAGES);
     }
 
     public function testConvertToJPG(){

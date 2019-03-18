@@ -53,6 +53,7 @@ class PDFLib{
         $this->imageDeviceCommand = "";
         $this->imageExtention = "";
         $this->pngDownScaleFactor = "";
+        $this->file_prefix = "page-";
 
         $this->setDPI(self::$MAX_RESOLUTION);
         $this->setImageFormat(self::$IMAGE_FORMAT_JPEG);
@@ -85,6 +86,14 @@ class PDFLib{
 
     public function setDPI($dpi){
         $this->resolution = $dpi;
+    }
+
+    /**
+     * Change the default file prefix from "page-" to something else
+     * @param string $fileprefix
+     */
+    public function setFilePrefix($fileprefix){
+        $this->file_prefix = $fileprefix;
     }
 
     public function setImageFormat($imageformat,$pngScaleFactor = null){
@@ -128,12 +137,12 @@ class PDFLib{
         if(!($this->jpeg_quality >= 1 && $this->jpeg_quality <= 100)){
             $this->jpeg_quality = 100;
         }
-        $image_path = $this->output_path."/page-%d.".$this->imageExtention;
+        $image_path = $this->output_path."/".$this->file_prefix."%d.".$this->imageExtention;
         $output = $this->executeGS("-dSAFER -dBATCH -dNOPAUSE -sDEVICE=".$this->imageDeviceCommand." ".$this->pngDownScaleFactor." -r".$this->resolution." -dNumRenderingThreads=4 -dFirstPage=".$this->page_start." -dLastPage=".$this->page_end." -o\"".$image_path."\" -dJPEGQ=".$this->jpeg_quality." -q \"".($this->pdf_path)."\" -c quit");
 
         $fileArray = [];
         for($i=1; $i<=($this->page_end - $this->page_start + 1); ++$i){
-            $fileArray[] = "page-$i.".$this->imageExtention;
+            $fileArray[] = $this->file_prefix."$i.".$this->imageExtention;
         }
         if(!$this->checkFilesExists($this->output_path,$fileArray)){
             $errrorinfo = implode(",", $output);

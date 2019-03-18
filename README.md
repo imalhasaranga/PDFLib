@@ -32,6 +32,7 @@ $pdflib->setOutputPath($folder_path_for_images);
 $pdflib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG);
 $pdflib->setDPI(300);
 $pdflib->setPageRange(1,$pdflib->getNumberOfPages());
+$pdflib->setFilePrefix('page-'); // Optional
 $pdflib->convert();
 
 ```
