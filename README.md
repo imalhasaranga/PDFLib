@@ -32,7 +32,22 @@ $pdflib->setOutputPath($folder_path_for_images);
 $pdflib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG);
 $pdflib->setDPI(300);
 $pdflib->setPageRange(1,$pdflib->getNumberOfPages());
+$pdflib->setFilePrefix('page-'); // Optional
 $pdflib->convert();
+
+```
+Alternatively using chaining:
+
+```php
+
+$files = (new ImalH\PDFLib\PDFLib())
+    ->setPdfPath($pdf_file_path)
+    ->setOutputPath($folder_path_for_images)
+    ->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG)
+    ->setDPI(300)
+    ->setPageRange(1,$pdflib->getNumberOfPages())
+    ->setFilePrefix('page-') // Optional
+    ->convert();
 
 ```
 

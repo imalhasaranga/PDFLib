@@ -53,6 +53,7 @@ class PDFLib{
         $this->imageDeviceCommand = "";
         $this->imageExtention = "";
         $this->pngDownScaleFactor = "";
+        $this->file_prefix = "page-";
 
         $this->setDPI(self::$MAX_RESOLUTION);
         $this->setImageFormat(self::$IMAGE_FORMAT_JPEG);
@@ -65,28 +66,75 @@ class PDFLib{
         }
     }
 
+    /**
+     * Set the path to the PDF file to process
+     * @param string $pdf_path
+     * @return self
+     */
     public function setPdfPath($pdf_path){
         $this->pdf_path = $pdf_path;
         $this->number_of_pages = -1;
+        return $this;
     }
 
+    /**
+     * Set the output path to where to store the generated files
+     * @param string $output_path
+     * @return self
+     */
     public function setOutputPath($output_path){
         $this->output_path= $output_path;
+        return $this;
     }
 
+    /**
+     * Change the generated JPG quality from the default of 100
+     * @param integer $jpeg_quality
+     * @return self
+     */
     public function setImageQuality($jpeg_quality){
         $this->jpeg_quality = $jpeg_quality;
+        return $this;
     }
 
+    /**
+     * Set a start and end page to process.
+     * @param integer $start
+     * @param integer $end
+     * @return self
+     */
     public function setPageRange($start, $end){
         $this->page_start = $start;
         $this->page_end = $end;
+        return $this;
     }
 
+    /**
+     * Change the resolution of the output file from the default 300dpi
+     * @param integer $end
+     * @return self
+     */
     public function setDPI($dpi){
         $this->resolution = $dpi;
+        return $this;
     }
 
+    /**
+     * Change the default file prefix from "page-" to something else
+     * @param string $fileprefix
+     * @return self
+     */
+    public function setFilePrefix($fileprefix){
+        $this->file_prefix = $fileprefix;
+        return $this;
+    }
+
+    /**
+     * Change the image format to PNG or JPEG
+     * @param string $imageformat
+     * @param float $pngScaleFactor
+     * @return self
+     */
     public function setImageFormat($imageformat,$pngScaleFactor = null){
         if($imageformat == self::$IMAGE_FORMAT_JPEG){
             $this->imageDeviceCommand = "jpeg";
@@ -97,6 +145,7 @@ class PDFLib{
             $this->imageExtention="png";
             $this->pngDownScaleFactor = "";
         }
+        return $this;
     }
 
     public function getNumberOfPages(){
@@ -128,12 +177,12 @@ class PDFLib{
         if(!($this->jpeg_quality >= 1 && $this->jpeg_quality <= 100)){
             $this->jpeg_quality = 100;
         }
-        $image_path = $this->output_path."/page-%d.".$this->imageExtention;
+        $image_path = $this->output_path."/".$this->file_prefix."%d.".$this->imageExtention;
         $output = $this->executeGS("-dSAFER -dBATCH -dNOPAUSE -sDEVICE=".$this->imageDeviceCommand." ".$this->pngDownScaleFactor." -r".$this->resolution." -dNumRenderingThreads=4 -dFirstPage=".$this->page_start." -dLastPage=".$this->page_end." -o\"".$image_path."\" -dJPEGQ=".$this->jpeg_quality." -q \"".($this->pdf_path)."\" -c quit");
 
         $fileArray = [];
         for($i=1; $i<=($this->page_end - $this->page_start + 1); ++$i){
-            $fileArray[] = "page-$i.".$this->imageExtention;
+            $fileArray[] = $this->file_prefix."$i.".$this->imageExtention;
         }
         if(!$this->checkFilesExists($this->output_path,$fileArray)){
             $errrorinfo = implode(",", $output);
@@ -188,7 +237,7 @@ class PDFLib{
                 if(!((is_array($output) && (strpos($output[0], 'is not recognized as an internal or external command') !== false)) || !is_array($output) && trim($output) == "")){
                     $this->gs_command = "gs";
                     $this->gs_version = doubleval($output[0]);
-                    $this->gs_path = "/usr/local/share/ghostscript/".$this->gs_version;
+                    $this->gs_path = ""; // The ghostscript will find the path itself
                     $this->gs_is_64 = "NOT WIN";
                 }
             }
@@ -222,6 +271,9 @@ class PDFLib{
     }
 
     private function getGSLibFilePath($filename){
+        if(!$this->gs_path){
+            return $filename;
+        }
         if($this->is_os_win){
             return $this->gs_path."\\lib\\$filename";
         }else{
