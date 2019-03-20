@@ -1,4 +1,4 @@
-# PDFlib 1.2.2
+# PDFlib 1.3.0
 PDFlib is a project which enables you to interact with PDFs, Current Release provide you methods to convert PDF to Images as well as Images to PDF, future releases will included more functions to interact with PDF files
 
 This project is an initiative of [Treinetic (Pvt) Ltd](http://www.treinetic.com), Sri Lanka. 
