@@ -197,14 +197,19 @@ class PDFLib{
             if($this->gs_command == "gswin32c.exe" || $this->gs_command == "gswin64c.exe") {
                 $singleImage = str_replace('\\', '/', $singleImage);
             }
-            $imagesources .= '('.$singleImage.')  viewJPEG showpage ';
+            $imagesources .= "($singleImage)  viewJPEG showpage \r\n";
         }
+        $tmpHandle = tmpfile();
+        $path = stream_get_meta_data($tmpHandle)['uri'];
+        fwrite($tmpHandle,$imagesources);
+    
         $psfile  = $this->getGSLibFilePath("viewjpeg.ps");
-        $command = '-dBATCH -dNOPAUSE -sDEVICE=pdfwrite -o"'.$ouput_path_pdf_name.'" "'.$psfile.'" -c "'.$imagesources.'"';
+        $command = '-dBATCH -dNOPAUSE -sDEVICE=pdfwrite -o"'.$ouput_path_pdf_name.'" "'.$psfile.'"'." -@ $path";
         $command_results = $this->executeGS($command);
         if(!$this->checkFilesExists("",[$ouput_path_pdf_name])){
             throw new \Exception("Unable to make PDF : ".$command_results[2],500);
         }
+        fclose($tmpHandle);
     }
 
     public function getGSVersion(){
