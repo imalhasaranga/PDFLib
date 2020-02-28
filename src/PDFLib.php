@@ -35,11 +35,11 @@ class PDFLib{
     private $imageExtention;
     private $pngDownScaleFactor;
 
-    private $is_os_win = null;
-    private $gs_command = null;
-    private $gs_version = null;
-    private $gs_is_64 = null;
-    private $gs_path = null;
+    public $is_os_win = null;
+    public $gs_command = null;
+    public $gs_version = null;
+    public $gs_is_64 = null;
+    public $gs_path = null;
 
     public function __construct(){
 
