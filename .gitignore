@@ -1,2 +1,5 @@
-composer.lock
+.idea
+.idea/**
 vendor
+composer.lock
+/tests/data
