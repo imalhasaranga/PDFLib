@@ -1,5 +1,0 @@
-.idea
-.idea/**
-vendor
-composer.lock
-/tests/data
