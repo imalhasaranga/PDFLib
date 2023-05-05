@@ -34,6 +34,9 @@ class PDFLib{
     private $imageDeviceCommand;
     private $imageExtention;
     private $pngDownScaleFactor;
+    
+    // Was missing
+    private $file_prefix;
 
     private $is_os_win = null;
     private $gs_command = null;
