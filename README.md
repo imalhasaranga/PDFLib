@@ -17,7 +17,7 @@ You should have [Ghostscript](http://www.ghostscript.com/) >= 9.16 installed and
 
 The package can be installed via composer:
 ``` bash
-$ composer require imal-h/pdflib
+$ composer require imal-h/pdf-box
 ```
 
 ## Usage
