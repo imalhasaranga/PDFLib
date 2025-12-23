@@ -14,6 +14,25 @@ This project is an initiative of [Treinetic (Pvt) Ltd](http://www.treinetic.com)
 *   **PHP** >= 5.5.0
 *   **Ghostscript** >= 9.16 installed and configured on your system.
 
+### Installing Ghostscript
+
+**Ubuntu / Debian**
+```bash
+sudo apt-get update
+sudo apt-get install ghostscript
+```
+
+**MacOS (Homebrew)**
+```bash
+brew install ghostscript
+```
+
+**Windows**
+1.  Download the **Ghostscript AGPL Release** installer from the [official website](https://www.ghostscript.com/download/gsdnld.html).
+2.  Run the installer.
+3.  **Important**: Add the `bin` and `lib` directories of your Ghostscript installation (e.g., `C:\Program Files\gs\gs9.54.0\bin`) to your system's `PATH` environment variable.
+4.  Verify by running `gswin64c -v` in Command Prompt.
+
 ## Installation
 
 Install via Composer:
