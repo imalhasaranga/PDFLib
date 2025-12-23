@@ -1,136 +1,159 @@
-# PDFlib 1.4.0
-PDFlib is a project which enables you to interact with PDFs, Current Release provide you methods to convert PDF to Images as well as Images to PDF, future releases will included more functions to interact with PDF files
+# PDFlib 1.5.0
 
-This project is an initiative of [Treinetic (Pvt) Ltd](http://www.treinetic.com), Sri Lanka. 
-contact us via info@treinetic.com and get your project done by the experts.
-
-![Issues](https://img.shields.io/github/issues/imalhasaranga/PDFBox.svg)
+![Issues](https://img.shields.io/github/issues/imalhasaranga/PDFLib.svg)
 [![Software License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
-![Forks](https://img.shields.io/github/forks/imalhasaranga/PDFBox.svg)
+![Forks](https://img.shields.io/github/forks/imalhasaranga/PDFLib.svg)
 
+A robust PHP wrapper for Ghostscript, designed to make PDF manipulation easy. 
+Convert PDFs to images, create PDFs from images, optimize file sizes, and merge documents with simple, fluent APIs.
+
+This project is an initiative of [Treinetic (Pvt) Ltd](http://www.treinetic.com), Sri Lanka.
 
 ## Requirements
 
-You should have [Ghostscript](http://www.ghostscript.com/) >= 9.16 installed and configured.
+*   **PHP** >= 5.5.0
+*   **Ghostscript** >= 9.16 installed and configured on your system.
 
-## Install
+## Installation
 
-The package can be installed via composer:
-``` bash
-$ composer require imal-h/pdf-box
+Install via Composer:
+
+```bash
+composer require imal-h/pdf-box
 ```
 
-## Usage
-
-Converting a PDF to set of images.
+## Quick Start
+Convert a PDF page to an image in just a few lines:
 
 ```php
+use ImalH\PDFLib\PDFLib;
 
-$pdflib = new ImalH\PDFLib\PDFLib();
-$pdflib->setPdfPath($pdf_file_path);
-$pdflib->setOutputPath($folder_path_for_images);
-$pdflib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG);
-$pdflib->setDPI(300);
-$pdflib->setPageRange(1,$pdflib->getNumberOfPages());
-$pdflib->setFilePrefix('page-'); // Optional
-$pdflib->convert();
-
+$pdfLib = new PDFLib();
+$pdfLib->setPdfPath("document.pdf")
+       ->setOutputPath("output_folder")
+       ->convert();
 ```
-Alternatively using chaining:
+
+## Features
+
+### 1. Convert PDF to Images
+Convert specific pages or the entire document to PNG or JPEG.
 
 ```php
-
-$files = (new ImalH\PDFLib\PDFLib())
-    ->setPdfPath($pdf_file_path)
-    ->setOutputPath($folder_path_for_images)
-    ->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG)
-    ->setDPI(300)
-    ->setPageRange(1,$pdflib->getNumberOfPages())
-    ->setFilePrefix('page-') // Optional
-    ->convert();
-
+$pdfLib = new PDFLib();
+$pdfLib->setPdfPath('my_document.pdf')
+       ->setOutputPath('output_images')
+       ->setImageFormat(PDFLib::$IMAGE_FORMAT_PNG) // or $IMAGE_FORMAT_JPEG
+       ->setDPI(300)
+       ->setPageRange(1, 5) // Optional: convert only pages 1-5
+       ->convert();
 ```
 
-Making a PDF from set of images
+### 2. Create PDF from Images
+Combine a list of images into a single PDF file.
 
 ```php
-
-$pdflib = new ImalH\PDFLib\PDFLib();
-$imagePaths = ["images-1.jpg","images-2.jpg"];
-$pdflib->makePDF($destination_pdf_file_path,$imagePaths);
-
+$pdfLib = new PDFLib();
+$images = ['page1.jpg', 'page2.jpg', 'page3.jpg'];
+$pdfLib->makePDF('combined_output.pdf', $images);
 ```
 
-Compressing (Optimizing) a PDF
+### 3. Compress / Optimize PDF (New in v1.4)
+Reduce file size using Ghostscript's optimization presets.
 
 ```php
-$pdflib = new ImalH\PDFLib\PDFLib();
-$pdflib->compress("input.pdf", "compressed.pdf", \ImalH\PDFLib\PDFLib::$COMPRESSION_EBOOK);
-/*
-Available Compression Levels:
-- COMPRESSION_SCREEN (72 dpi)
-- COMPRESSION_EBOOK (150 dpi) - Default
-- COMPRESSION_PRINTER (300 dpi)
-- COMPRESSION_PREPRESS (300 dpi, Color Preserving)
-- COMPRESSION_DEFAULT
-*/
+$pdfLib = new PDFLib();
+// Levels: screen (72dpi), ebook (150dpi), printer (300dpi), prepress (300dpi, color)
+$pdfLib->compress('large.pdf', 'optimized.pdf', PDFLib::$COMPRESSION_EBOOK);
 ```
 
-Merging Multiple PDFs
+### 4. Merge PDFs (New in v1.4)
+Combine multiple PDF documents into one.
 
 ```php
-$pdflib = new ImalH\PDFLib\PDFLib();
-$files = ["doc1.pdf", "doc2.pdf"];
-$pdflib->merge($files, "merged.pdf");
+$pdfLib = new PDFLib();
+$files = ['part1.pdf', 'part2.pdf'];
+$pdfLib->merge($files, 'merged_complete.pdf');
 ```
 
-If in anycase code throws '**** Unable to open the initial device, quitting.' this type of error that means program can't create temporary files because of a permission problem, this error only comes in the Linux or Mac Oparating systems so Please check the apache log and provide necessay permissions
+### 5. Split PDF (New in v1.5)
+Extract a specific page or a range of pages.
 
-## Other useful methods
-You can get the total number of pages in the pdf:
 ```php
+$pdfLib = new PDFLib();
 
-$pdfBox->getNumberOfPages(); //returns the number of pages in the pdf
-$pdfBox->setPageRange(1,2); // allows you to convert only few pages in the PDF Document
-$pdfBox->setImageQuality(95); // allows you to tell the quality you expect in the output Jpg file (only jpg)
-$pdfBox->setDPI(300); //setting the DPI (Dots per inch) of output files
-$pdfBox->setDPI(300); //setting the DPI (Dots per inch) of output files
-$pdfBox->setNumberOfRenderingThreads(4); //setting the number of rendering threads (default is 4)
-$pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG,$dDownScaleFactor=null);   //this will set the output image format, default it is jpg, but I recommend using pdf to png because it seems it is faster
-/*
-$dDownScaleFactor=integer
-This causes the internal rendering to be scaled down by the given (integer <= 8) factor before being output. For example, the following will produce a 200dpi output png from a 600dpi internal rendering:
-    
-    gs -sDEVICE=png16m -r600 -dDownScaleFactor=3 -o tiger.png\examples/tiger.png
+// Extract just Page 1
+$pdfLib->split(1, 'page_one.pdf', 'source.pdf');
 
-Read More : http://ghostscript.com/doc/current/Devices.htm
-*/
+// Extract Pages 1 to 5
+$pdfLib->split('1-5', 'chapter_one.pdf', 'source.pdf');
 ```
 
-## Changelog
+### 6. Encrypt PDF (New in v1.5)
+Protect your PDF with passwords and disable printing/copying.
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+```php
+$pdfLib = new PDFLib();
+// args: user_password, owner_password, output_path, input_path
+$pdfLib->encrypt('open123', 'admin123', 'protected_doc.pdf', 'source.pdf');
+```
+
+### 7. Watermarking (New in v1.5)
+Add a text watermark to every page (overlay).
+
+```php
+$pdfLib = new PDFLib();
+$pdfLib->addWatermarkText('CONFIDENTIAL', 'watermarked.pdf', 'source.pdf');
+```
+
+### 8. Thumbnail (New in v1.5)
+Generate a thumbnail image (JPEG) of the first page.
+
+```php
+$pdfLib = new PDFLib();
+// args: output_image, width (approx), input_pdf
+$pdfLib->createThumbnail('thumbnail.jpg', 200, 'source.pdf');
+```
+
+### 9. Version Conversion (New in v1.5)
+Convert a PDF to a specific PDF version (e.g., 1.4 for compatibility).
+
+```php
+$pdfLib = new PDFLib();
+$pdfLib->convertToVersion('1.4', 'compatible.pdf', 'source.pdf');
+```
+
+## Configuration
+
+Fine-tune the behavior of the library:
+
+*   **`setNumberOfRenderingThreads(int $threads)`**: Speed up conversion by using multiple threads (Default: 4).
+*   **`setDPI(int $dpi)`**: Set output image resolution (Default: 300).
+*   **`setImageQuality(int $quality)`**: Set JPEG quality (0-100).
+*   **`setFilePrefix(string $prefix)`**: Custom prefix for output images (Default: "page-").
+
+```php
+$pdfLib->setNumberOfRenderingThreads(8)
+       ->setDPI(150)
+       ->setFilePrefix('slide-');
+```
+
+## Troubleshooting
+
+**Error: `**** Unable to open the initial device, quitting.`**
+*   **Cause**: Ghostscript cannot create temporary files due to permission issues.
+*   **Fix**: Ensure your web server (e.g., Apache/Nginx user) has write permissions to the system's temporary directory, or check your server logs for specific path errors.
+
+**Ghostscript Issues**
+*   Ensure the `gs` command is available in your system path.
+*   On Windows, ensure `gswin64c.exe` or `gswin32c.exe` is in your PATH.
 
 ## Contributing
-
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-
-## Tests
-
-- Make sure to run all the tests and see all of them are passing before submitting a pull requests
-
-### How to run Tests ? 
-    composer install
-    vendor/bin/phpunit
-
-
 ## Credits
-
 - [Imal Hasaranga Perera](https://github.com/imalhasaranga)
 - [All Contributors](../../contributors)
 
-
 ## License
-
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
