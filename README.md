@@ -1,4 +1,4 @@
-# PDFlib 1.3.2
+# PDFlib 1.4.0
 PDFlib is a project which enables you to interact with PDFs, Current Release provide you methods to convert PDF to Images as well as Images to PDF, future releases will included more functions to interact with PDF files
 
 This project is an initiative of [Treinetic (Pvt) Ltd](http://www.treinetic.com), Sri Lanka. 
@@ -59,6 +59,29 @@ $pdflib = new ImalH\PDFLib\PDFLib();
 $imagePaths = ["images-1.jpg","images-2.jpg"];
 $pdflib->makePDF($destination_pdf_file_path,$imagePaths);
 
+```
+
+Compressing (Optimizing) a PDF
+
+```php
+$pdflib = new ImalH\PDFLib\PDFLib();
+$pdflib->compress("input.pdf", "compressed.pdf", \ImalH\PDFLib\PDFLib::$COMPRESSION_EBOOK);
+/*
+Available Compression Levels:
+- COMPRESSION_SCREEN (72 dpi)
+- COMPRESSION_EBOOK (150 dpi) - Default
+- COMPRESSION_PRINTER (300 dpi)
+- COMPRESSION_PREPRESS (300 dpi, Color Preserving)
+- COMPRESSION_DEFAULT
+*/
+```
+
+Merging Multiple PDFs
+
+```php
+$pdflib = new ImalH\PDFLib\PDFLib();
+$files = ["doc1.pdf", "doc2.pdf"];
+$pdflib->merge($files, "merged.pdf");
 ```
 
 If in anycase code throws '**** Unable to open the initial device, quitting.' this type of error that means program can't create temporary files because of a permission problem, this error only comes in the Linux or Mac Oparating systems so Please check the apache log and provide necessay permissions

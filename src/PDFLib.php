@@ -25,6 +25,13 @@ class PDFLib
     public static $MAX_RESOLUTION = 300;
     public static $IMAGE_FORMAT_PNG = "PNG";
     public static $IMAGE_FORMAT_JPEG = "JPEG";
+
+    public static $COMPRESSION_SCREEN = "screen";
+    public static $COMPRESSION_EBOOK = "ebook";
+    public static $COMPRESSION_PRINTER = "printer";
+    public static $COMPRESSION_PREPRESS = "prepress";
+    public static $COMPRESSION_DEFAULT = "default";
+
     private $resolution;
     private $jpeg_quality;
     private $page_start;
@@ -234,6 +241,63 @@ class PDFLib
         if (!$this->checkFilesExists("", [$ouput_path_pdf_name])) {
             throw new \Exception("Unable to make PDF : " . $command_results[2], 500);
         }
+    }
+
+
+
+    /**
+     * Compress a PDF file
+     * @param string $source
+     * @param string $destination
+     * @param string $level One of the COMPRESSION_* constants
+     * @return bool
+     */
+    public function compress($source, $destination, $level = "screen")
+    {
+        if ($this->gs_command == "gswin32c.exe" || $this->gs_command == "gswin64c.exe") {
+            $source = str_replace('\\', '/', $source);
+            $destination = str_replace('\\', '/', $destination);
+        }
+
+        $command = '-sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/' . $level . ' -dNOPAUSE -dQUIET -dBATCH -sOutputFile="' . $destination . '" "' . $source . '"';
+        $output = $this->executeGS($command);
+
+        if (!file_exists($destination)) {
+            throw new \Exception("Unable to compress PDF: " . implode(" ", $output));
+        }
+        return true;
+    }
+
+    /**
+     * Merge multiple PDF files into one
+     * @param array $sourceFiles
+     * @param string $destination
+     * @return bool
+     */
+    public function merge($sourceFiles, $destination)
+    {
+        $fileList = "";
+        foreach ($sourceFiles as $file) {
+            if ($this->gs_command == "gswin32c.exe" || $this->gs_command == "gswin64c.exe") {
+                $file = str_replace('\\', '/', $file);
+            }
+            if (!file_exists($file)) {
+                throw new \Exception("File not found: " . $file);
+            }
+            $fileList .= '"' . $file . '" ';
+        }
+
+        if ($this->gs_command == "gswin32c.exe" || $this->gs_command == "gswin64c.exe") {
+            $destination = str_replace('\\', '/', $destination);
+        }
+
+        $command = '-sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -sOutputFile="' . $destination . '" ' . $fileList;
+        $output = $this->executeGS($command);
+
+        if (!file_exists($destination)) {
+            throw new \Exception("Unable to merge PDFs: " . implode(" ", $output));
+        }
+        return true;
     }
 
     public function getGSVersion()

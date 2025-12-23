@@ -153,6 +153,34 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         self::assertTrue($pdfLib->getNumberOfPages() == count($fullpaths));
     }
 
+    public function testCompression()
+    {
+        self::clean();
+        $pdfLib = new \ImalH\PDFLib\PDFLib();
+        $outputPath = self::$_DATA_FOLDER . "/compressed.pdf";
+        $success = $pdfLib->compress(self::$_SAMPLE_PDF, $outputPath, \ImalH\PDFLib\PDFLib::$COMPRESSION_SCREEN);
+        self::assertTrue($success);
+        self::assertTrue(file_exists($outputPath));
+        self::assertTrue(filesize($outputPath) > 0);
+    }
+
+    public function testMerge()
+    {
+        self::clean();
+        $pdfLib = new \ImalH\PDFLib\PDFLib();
+        $outputPath = self::$_DATA_FOLDER . "/merged.pdf";
+        // Merge the sample PDF with itself
+        $success = $pdfLib->merge([self::$_SAMPLE_PDF, self::$_SAMPLE_PDF], $outputPath);
+        self::assertTrue($success);
+        self::assertTrue(file_exists($outputPath));
+
+        // Verify page count of merged file (should be double)
+        $pdfLibMerged = new \ImalH\PDFLib\PDFLib();
+        $pdfLibMerged->setPdfPath($outputPath);
+        $pages = $pdfLibMerged->getNumberOfPages();
+        self::assertTrue($pages == (self::$_SAMPLE_PDF_PAGES * 2));
+    }
+
 
 
     public static function tearDownAfterClass()
