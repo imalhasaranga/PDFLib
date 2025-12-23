@@ -142,6 +142,61 @@ $pdfLib = new PDFLib();
 $pdfLib->convertToVersion('1.4', 'compatible.pdf', 'source.pdf');
 ```
 
+### 10. Metadata Management (New in v2.0)
+Set PDF properties like Title, Author, etc.
+
+```php
+$pdfLib = new PDFLib();
+$metadata = [
+    'Title' => 'Financial Report 2024',
+    'Author' => 'Finance Dept',
+    'Keywords' => 'finance, 2024, report'
+];
+$pdfLib->setMetadata($metadata, 'tagged.pdf', 'source.pdf');
+```
+
+### 11. Page Rotation (New in v2.0)
+Rotate all pages by 90, 180, or 270 degrees.
+
+```php
+$pdfLib = new PDFLib();
+// Rotate 90 degrees clockwise
+$pdfLib->rotateAll(90, 'rotated.pdf', 'source.pdf');
+```
+
+### 12. Form Flattening (New in v2.0)
+Burn interactive form fields into the page content (prevent editing).
+
+```php
+$pdfLib = new PDFLib();
+$pdfLib->flatten('flat.pdf', 'form.pdf');
+```
+
+### 13. PDF/A Conversion (New in v2.0)
+Convert to PDF/A-1b standard for archival (requires valid color profiles in Ghostscript).
+
+```php
+$pdfLib = new PDFLib();
+try {
+    $pdfLib->convertToPDFA('archive.pdf', 'source.pdf');
+} catch (Exception $e) {
+    echo "PDF/A conversion failed: " . $e->getMessage();
+}
+```
+
+### 14. OCR (Optical Character Recognition) (New in v2.0)
+Convert scanned PDFs to searchable text. **Requires Ghostscript >= 9.53 with Tesseract/OCR devices.**
+
+```php
+$pdfLib = new PDFLib();
+try {
+    // Language code: 'eng', 'deu', 'spa', etc.
+    $pdfLib->ocr('eng', 'searchable.pdf', 'scanned.pdf');
+} catch (Exception $e) {
+    echo "OCR failed (check if Tesseract is installed): " . $e->getMessage();
+}
+```
+
 ## Configuration
 
 Fine-tune the behavior of the library:
