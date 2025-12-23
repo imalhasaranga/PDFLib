@@ -17,7 +17,7 @@ You should have [Ghostscript](http://www.ghostscript.com/) >= 9.16 installed and
 
 The package can be installed via composer:
 ``` bash
-$ composer require imal-h/pdf-box
+$ composer require imal-h/pdflib
 ```
 
 ## Usage
@@ -71,6 +71,8 @@ $pdfBox->getNumberOfPages(); //returns the number of pages in the pdf
 $pdfBox->setPageRange(1,2); // allows you to convert only few pages in the PDF Document
 $pdfBox->setImageQuality(95); // allows you to tell the quality you expect in the output Jpg file (only jpg)
 $pdfBox->setDPI(300); //setting the DPI (Dots per inch) of output files
+$pdfBox->setDPI(300); //setting the DPI (Dots per inch) of output files
+$pdfBox->setNumberOfRenderingThreads(4); //setting the number of rendering threads (default is 4)
 $pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG,$dDownScaleFactor=null);   //this will set the output image format, default it is jpg, but I recommend using pdf to png because it seems it is faster
 /*
 $dDownScaleFactor=integer
@@ -93,7 +95,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Tests
 
-- Make sure to run all the tests and see all of them are pssing before sumbitting a pull requests
+- Make sure to run all the tests and see all of them are passing before submitting a pull requests
 
 ### How to run Tests ? 
     composer install

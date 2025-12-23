@@ -27,7 +27,8 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         self::assertTrue($pagesCount == self::$_SAMPLE_PDF_PAGES);
     }
 
-    public function testConvertWithChaining(){
+    public function testConvertWithChaining()
+    {
         self::clean();
         $filesArray = (new \ImalH\PDFLib\PDFLib())
             ->setPdfPath(self::$_SAMPLE_PDF)
@@ -36,13 +37,28 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
             ->setDPI(300)
             ->setFilePrefix('custom')
             ->convert()
-            ;
-        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"custom");
+        ;
+        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER, "custom");
+        self::assertSame($fileCount, self::$_SAMPLE_PDF_PAGES);
+    }
+
+    public function testSetRenderingThreads()
+    {
+        self::clean();
+        $pdfLib = new \ImalH\PDFLib\PDFLib();
+        $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
+        $pdfLib->setOutputPath(self::$_DATA_FOLDER);
+        $pdfLib->setNumberOfRenderingThreads(2);
+        // We can't easily check the internal command without mocking, 
+        // but we can ensure it runs and produces output.
+        $pdfLib->convert();
+        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER, "page-");
         self::assertSame($fileCount, self::$_SAMPLE_PDF_PAGES);
     }
 
 
-    public function testConvertToPngWithCustomPrefix(){
+    public function testConvertToPngWithCustomPrefix()
+    {
         self::clean();
         $pdfLib = new \ImalH\PDFLib\PDFLib();
         $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
@@ -51,11 +67,12 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         $pdfLib->setDPI(300);
         $pdfLib->setFilePrefix('custom');
         $filesArray = $pdfLib->convert();
-        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"custom");
+        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER, "custom");
         self::assertSame($fileCount, self::$_SAMPLE_PDF_PAGES);
     }
 
-    public function testConvertToPng(){
+    public function testConvertToPng()
+    {
         self::clean();
         $pdfLib = new \ImalH\PDFLib\PDFLib();
         $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
@@ -63,11 +80,12 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         $pdfLib->setImageFormat(\ImalH\PDFLib\PDFLib::$IMAGE_FORMAT_PNG);
         $pdfLib->setDPI(300);
         $filesArray = $pdfLib->convert();
-        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"page-");
+        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER, "page-");
         self::assertSame($fileCount, self::$_SAMPLE_PDF_PAGES);
     }
 
-    public function testConvertToJPG(){
+    public function testConvertToJPG()
+    {
         self::clean();
         $pdfLib = new \ImalH\PDFLib\PDFLib();
         $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
@@ -76,7 +94,7 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         $pdfLib->setDPI(300);
         $pdfLib->setImageQuality(95);
         $filesArray = $pdfLib->convert();
-        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER,"page-");
+        $fileCount = self::countFilesNameStartsWith(self::$_DATA_FOLDER, "page-");
         self::assertTrue($fileCount == self::$_SAMPLE_PDF_PAGES);
     }
 
@@ -109,7 +127,8 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         self::assertTrue($fileCount == count($filesArray));
     }
 
-    public function testImageToPdf(){
+    public function testImageToPdf()
+    {
         self::clean();
         $pdfLib = new \ImalH\PDFLib\PDFLib();
         $pdfLib->setPdfPath(self::$_SAMPLE_PDF);
@@ -120,14 +139,14 @@ class PDFLibTest extends PHPUnit_Framework_TestCase
         $pdfLib->setPageRange(2, 4);
         $filesArray = $pdfLib->convert();
         $fullpaths = [];
-        foreach ($filesArray as $item){
-            $fullpaths[] = self::$_DATA_FOLDER."/".$item;
+        foreach ($filesArray as $item) {
+            $fullpaths[] = self::$_DATA_FOLDER . "/" . $item;
         }
-        $pdfFileName = self::$_DATA_FOLDER."/from_images.pdf";
-        if(file_exists($pdfFileName)){
+        $pdfFileName = self::$_DATA_FOLDER . "/from_images.pdf";
+        if (file_exists($pdfFileName)) {
             unlink($pdfFileName);
         }
-        $pdfLib->makePDF($pdfFileName,$fullpaths);
+        $pdfLib->makePDF($pdfFileName, $fullpaths);
 
         $pdfLib = new \ImalH\PDFLib\PDFLib();
         $pdfLib->setPdfPath($pdfFileName);
