@@ -9,6 +9,16 @@ Convert PDFs to images, create PDFs from images, optimize file sizes, and merge 
 
 This project is an initiative of [Treinetic (Pvt) Ltd](http://www.treinetic.com), Sri Lanka.
 
+## Feature Highlights
+
+| Basic Operations | Manipulation (v1.5) | Advanced (v2.0) |
+| :--- | :--- | :--- |
+| [PDF to Images](#1-convert-pdf-to-images) | [Split PDF](#5-split-pdf-new-in-v15) | [OCR (Text Recognition)](#14-ocr-optical-character-recognition-new-in-v20) |
+| [Images to PDF](#2-create-pdf-from-images) | [Encrypt / Protect](#6-encrypt-pdf-new-in-v15) | [PDF/A Archiving](#13-pdfa-conversion-new-in-v20) |
+| [Compress / Optimize](#3-compress--optimize-pdf-new-in-v14) | [Watermark](#7-watermarking-new-in-v15) | [Page Rotation](#11-page-rotation-new-in-v20) |
+| [Merge PDFs](#4-merge-pdfs-new-in-v14) | [Thumbnail](#8-thumbnail-new-in-v15) | [Metadata Editing](#10-metadata-management-new-in-v20) |
+| | [Version Convert](#9-version-conversion-new-in-v15) | [Form Flattening](#12-form-flattening-new-in-v20) |
+
 ## Requirements
 
 *   **PHP** >= 5.5.0
