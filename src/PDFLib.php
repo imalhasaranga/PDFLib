@@ -400,24 +400,18 @@ class PDFLib
             $destination = str_replace('\\', '/', $destination);
         }
 
-        // Use png16m for high quality thumbnail, downscale to target width
-        // Getting exact width in GS is tricky without knowning input size.
-        // A common trick is to render at high DPI then resize, but here we will try to use -dFitPage or similar if possible.
-        // Since GS doesn't support "resize to X width" directly easily without complex filter commands,
-        // we will render the first page as usual but set a fixed low-ish DPI for speed, 
-        // OR rely on the user to accept the dpi-based size. 
-        // CORRECT APPROACH for robust thumbnail: Render page 1 to high-res, then using a lightweight PHP lib like GD or Imagick to resize might be better,
-        // BUT the requirements is to be a wrapper.
-        // Let's use a fixed common DPI (72) for thumbnail or allow user to set it.
-        // Actually, let's stick to a simple page-1 conversion for now, maybe finding a way to force size.
-        // For simplicity in v1.5, "createThumbnail" will be an alias to converting page 1 with a specific safe DPI (e.g. 72 or 96).
+        // Improved thumbnail generation strategy:
+        // Use -dPDFFitPage to fit the content into a specific box defined by DEVICEWIDTHPOINTS
+        // We set height large to allow aspect ratio preservation based on width.
+        $height = $width * 4; // Assume max aspect ratio 1:4
 
-        $dpi = 72; // Default screen dpi
+        $command = '-sDEVICE=jpeg -dJPEGQ=80 -dNOPAUSE -dQUIET -dBATCH -dFirstPage=1 -dLastPage=1 ' .
+            '-dPDFFitPage -dFixedMedia -dDEVICEWIDTHPOINTS=' . $width . ' -dDEVICEHEIGHTPOINTS=' . $height . ' ' .
+            '-sOutputFile="' . $destination . '" "' . $source . '"';
 
-        $command = '-sDEVICE=jpeg -dJPEGQ=80 -dNOPAUSE -dQUIET -dBATCH -dFirstPage=1 -dLastPage=1 -r' . $dpi . ' -sOutputFile="' . $destination . '" "' . $source . '"';
         $output = $this->executeGS($command);
 
-        if (!file_exists($destination)) {
+        if (!file_exists($destination) || filesize($destination) === 0) {
             throw new \Exception("Unable to create thumbnail: " . implode(" ", $output));
         }
         return true;
@@ -602,17 +596,46 @@ class PDFLib
         // We need a PDFA_def.ps file. We will create a temp one.
         $defFile = sys_get_temp_dir() . '/PDFA_def_' . uniqid() . '.ps';
 
+        // Attempt to find a valid ICC profile in certain system paths
+        $iccProfilePath = null;
+        $candidates = [
+            __DIR__ . '/../resources/srgb.icc', // Bundled?
+            '/usr/share/color/icc/sRGB.icc',
+            '/usr/share/color/icc/colord/sRGB.icc',
+            '/System/Library/ColorSync/Profiles/sRGB Profile.icc',
+            'C:\\Windows\\System32\\spool\\drivers\\color\\sRGB Color Space Profile.icm'
+        ];
+
+        foreach ($candidates as $path) {
+            if (file_exists($path)) {
+                $iccProfilePath = $path;
+                break;
+            }
+        }
+
+        // Escape path for PostScript (backslash to forward slash, escape parens)
+        if ($iccProfilePath) {
+            $iccProfilePath = str_replace('\\', '/', $iccProfilePath);
+            // On Windows GS sometimes expects /c/Windows/... format or regular paths. Forward slash is safest.
+        } else {
+            // Fallback to expecting GS to have a default or failing gracefully
+            // Ideally we should verify strict PDF/A compliance requires this.
+            // Usually GS fails if it cannot find the file defined in /ICCProfile.
+            // If we leave it as string (sRGB), it might look for a file named "sRGB".
+            $iccProfilePath = "srgb.icc"; // Expecting user to put it in cwd? 
+        }
+
         $pdfaDefContent = <<<EOT
 %!
 % This is a minimal PDFA_def.ps for PDF/A-1b conversion
-/ICCProfile (sRGB) def 
+/ICCProfile ($iccProfilePath) def 
 /OutputConditionIdentifier (sRGB) def
 /OutputCondition (sRGB) def
 /DocTitle (PDF/A Generated) def
 /DocCreator (PDFLib) def
 /DocProducer (Ghostscript) def
 /Keys <</Title (PDF/A Generated) /Creator (PDFLib) /Producer (Ghostscript) >> def
-/CurrentICCProfile (sRGB) def 
+/CurrentICCProfile ($iccProfilePath) def 
 EOT;
         // In a real robust implementation, we might need to embed the actual ICC profile file path logic.
         // GS often ships with default profiles or fails if ICCProfile path is invalid.
@@ -643,7 +666,7 @@ EOT;
         if (file_exists($defFile))
             unlink($defFile);
 
-        if (!file_exists($destination)) {
+        if (!file_exists($destination) || filesize($destination) === 0) {
             throw new \Exception("Unable to convert to PDF/A: " . implode(" ", $output));
         }
         return true;
@@ -668,7 +691,7 @@ EOT;
         // Basic check if OCR device is likely available (naive) or just try it.
         // sDEVICE=pdfocr8
 
-        $command = '-sDEVICE=pdfocr8 -dOCRLanguage="' . $language . '" -dNOPAUSE -dQUIET -dBATCH -sOutputFile="' . $destination . '" "' . $source . '"';
+        $command = '-sDEVICE=pdfocr8 -sOCRLanguage="' . $language . '" -dNOPAUSE -dQUIET -dBATCH -sOutputFile="' . $destination . '" "' . $source . '"';
         $output = $this->executeGS($command);
 
         if (!file_exists($destination)) {
