@@ -7,6 +7,8 @@
 A robust PHP wrapper for Ghostscript, designed to make PDF manipulation easy. 
 Convert PDFs to images, create PDFs from images, optimize file sizes, and merge documents with simple, fluent APIs.
 
+👉 **[Try the Interactive Demo](demo/README.md)** (Run it locally to see features in action)
+
 This project is an initiative of [Treinetic (Pvt) Ltd](http://www.treinetic.com), Sri Lanka.
 
 ## Feature Highlights
