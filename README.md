@@ -1,4 +1,4 @@
-# PDFlib 2.0.0
+# PDFlib 2.0.1
 
 ![Issues](https://img.shields.io/github/issues/imalhasaranga/PDFLib.svg)
 [![Software License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
