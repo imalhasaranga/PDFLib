@@ -48,10 +48,12 @@ jobs:
     - name: Install Dependencies (Windows)
       if: runner.os == 'Windows'
       run: |
-        choco install ghostscript
-        choco install pdftk-server
-        # Add to PATH might be needed, but choco usually handles it.
-        # We might need to refresh env vars or rely on default paths being picked up by choco.
+        choco install ghostscript --no-progress
+        choco install pdftk-server --no-progress
+        
+        # Add Ghostscript to PATH
+        $gsPath = Get-ChildItem "C:\Program Files\gs\*\bin" | Select-Object -ExpandProperty FullName -First 1
+        echo "$gsPath" >> $env:GITHUB_PATH
 
     # --- Composer ---
 
