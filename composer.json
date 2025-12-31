@@ -15,6 +15,11 @@
     ],
     "homepage": "https://github.com/imalhasaranga/PDFLib.git",
     "license": "MIT",
+    "support": {
+        "issues": "https://github.com/imalhasaranga/PDFLib/issues",
+        "source": "https://github.com/imalhasaranga/PDFLib",
+        "docs": "https://github.com/imalhasaranga/PDFLib/tree/master/docs"
+    },
     "authors": [
         {
             "name": "Imal hasaranga Perera",
