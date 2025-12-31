@@ -5,66 +5,120 @@ Try out before you actually use it
 docker run --pull always -p 9090:80 treineticprojects/demo_opensource:latest
 ```
 
-# PDFlib 2.0.1
+# PDFLib v3.0 (Alpha)
 
 ![Issues](https://img.shields.io/github/issues/imalhasaranga/PDFLib.svg)
 [![Software License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 ![Forks](https://img.shields.io/github/forks/imalhasaranga/PDFLib.svg)
 
-A robust PHP wrapper for Ghostscript, designed to make PDF manipulation easy. 
-Convert PDFs to images, create PDFs from images, optimize file sizes, and merge documents with simple, fluent APIs.
+**The most advanced, driver-based PDF manipulation library for PHP.**
 
-👉 **[Try the Interactive Demo](demo/README.md)** (Run it locally to see features in action)
+PDFLib v3.0 has been completely re-architected to be modular and driver-based, allowing you to switch between powerful backends like Ghostscript, Chrome Headless (coming soon), and OpenSSL for different tasks, all under a single, beautiful fluent API.
 
-This project is an initiative of [Treinetic (Pvt) Ltd](http://www.treinetic.com), Sri Lanka.
+👉 **[Try the Interactive Demo](demo/README.md)**
 
-## Feature Highlights
+---
 
-| Basic Operations | Manipulation (v1.5) | Advanced (v2.0) |
-| :--- | :--- | :--- |
-| [PDF to Images](#1-convert-pdf-to-images) | [Split PDF](#5-split-pdf-new-in-v15) | [OCR (Text Recognition)](#14-ocr-optical-character-recognition-new-in-v20) |
-| [Images to PDF](#2-create-pdf-from-images) | [Encrypt / Protect](#6-encrypt-pdf-new-in-v15) | [PDF/A Archiving](#13-pdfa-conversion-new-in-v20) |
-| [Compress / Optimize](#3-compress--optimize-pdf-new-in-v14) | [Watermark](#7-watermarking-new-in-v15) | [Page Rotation](#11-page-rotation-new-in-v20) |
-| [Merge PDFs](#4-merge-pdfs-new-in-v14) | [Thumbnail](#8-thumbnail-new-in-v15) | [Metadata Editing](#10-metadata-management-new-in-v20) |
-| | [Version Convert](#9-version-conversion-new-in-v15) | [Form Flattening](#12-form-flattening-new-in-v20) |
+## 🚀 What's New in v3.0?
 
-## Requirements
+- **Fluent API**: Modern, chainable interface (`PDF::init()->from()->to()->convert()`).
+- **Driver Support**: Decoupled architecture using `DriverInterface`. Default driver is `GhostscriptDriver`.
+- **PHP 8.1+**: Fully typed, strict, and modern codebase.
+- **Legacy Compatibility**: Full backward compatibility for v2.x code via a transparent Facade.
 
-*   **PHP** >= 5.5.0
-*   **Ghostscript** >= 9.16 installed and configured on your system.
+## 📦 Requirements
 
-### Installing Ghostscript
+*   **PHP** >= 8.1
+*   **Ghostscript** >= 9.16 (for GhostscriptDriver)
+*   **Google Chrome** or **Chromium** (for HTML to PDF)
+*   **pdftk** (PDF Toolkit) (for Form Filling)
 
-**Ubuntu / Debian**
-```bash
-sudo apt-get update
-sudo apt-get install ghostscript
-```
-
-**MacOS (Homebrew)**
-```bash
-brew install ghostscript
-```
-
-**Windows**
-1.  Download the **Ghostscript AGPL Release** installer from the [official website](https://www.ghostscript.com/download/gsdnld.html).
-2.  Run the installer.
-3.  **Important**: Add the `bin` and `lib` directories of your Ghostscript installation (e.g., `C:\Program Files\gs\gs9.54.0\bin`) to your system's `PATH` environment variable.
-4.  Verify by running `gswin64c -v` in Command Prompt.
-
-## Installation
-
-Install via Composer:
+## 🔧 Installation
 
 ```bash
 composer require imal-h/pdf-box
 ```
 
-## Quick Start
-Convert a PDF page to an image in just a few lines:
+## 📖 Usage
+
+### HTML to PDF (New in v3.0)
+
+Generate PDFs from HTML content or URLs using Chrome Headless.
 
 ```php
-use ImalH\PDFLib\PDFLib;
+use ImalH\PDFLib\PDF;
+
+// From HTML String
+PDF::init()
+    ->driver(PDF::DRIVER_CHROME)
+    ->convertFromHtml('<h1>Hello World</h1>', 'output.pdf');
+
+// From URL (Coming Soon)
+// PDF::init()->driver(PDF::DRIVER_CHROME)->fromUrl('https://google.com')->save('output.pdf');
+```
+
+### Digital Signatures (New in v3.0)
+
+Digitally sign PDFs using OpenSSL (requires `tecnickcom/tcpdf`).
+
+```php
+use ImalH\PDFLib\PDF;
+
+PDF::init()
+    ->driver(PDF::DRIVER_OPENSSL)
+    ->from('contract.pdf')
+    ->sign('certificate.crt', 'private_key.pem', 'signed_contract.pdf', [
+        'info' => [
+            'Name' => 'John Doe',
+            'Location' => 'Colombo, LK',
+            'Reason' => 'Digital Contract Signature'
+        ]
+    ]);
+    ]);
+```
+
+> **Note:** If you use a self-signed certificate (like in testing), PDF viewers will show "Signature Validity Unknown". For a green "Trusted" checkmark, use a certificate issued by a recognized Certificate Authority (CA) or explicitly trust your self-signed certificate in the viewer's settings.
+
+### Interactive Forms (New in v3.0)
+
+Fill PDF forms programmatically using `pdftk`.
+
+```php
+use ImalH\PDFLib\PDF;
+
+// 1. Inspect Fields (Optional)
+$fields = PDF::init()->driver(PDF::DRIVER_PDFTK)->getFormFields('form_template.pdf');
+// returns ['full_name', 'date', ...]
+
+// 2. Fill Form
+PDF::init()
+    ->driver(PDF::DRIVER_PDFTK)
+    ->from('form_template.pdf')
+    ->fillForm([
+        'full_name' => 'Imal Perera',
+        'date' => '2025-01-01'
+    ], 'filled_form.pdf');
+```
+
+### The Modern Way (Fluent API)
+
+```php
+use ImalH\PDFLib\PDF;
+
+// Convert PDF Page 1 to JPEG
+PDF::init()
+    ->driver(PDF::DRIVER_GHOSTSCRIPT)
+    ->from('document.pdf')
+    ->to('output_folder')
+    ->convert();
+```
+
+### The Legacy Way (v2.x Facade)
+
+Existing code continues to work without changes, but is marked as deprecated.
+
+```php
+use ImalH\PDFLib\PDFLib; // Legacy Class
 
 $pdfLib = new PDFLib();
 $pdfLib->setPdfPath("document.pdf")
@@ -72,181 +126,43 @@ $pdfLib->setPdfPath("document.pdf")
        ->convert();
 ```
 
-## Features
+## ✨ Features (Ghostscript Driver)
 
-### 1. Convert PDF to Images
-Convert specific pages or the entire document to PNG or JPEG.
+| Feature | Description | Driver |
+| :--- | :--- | :--- |
+| **HTML to PDF** | Generate PDF from HTML/CSS | Chrome |
+| **Digital Sign** | Sign PDFs with X.509 Certs | OpenSSL |
+| **Fill Forms** | Fill AcroForms (FDF) | PDFtk |
+| **Inspect Forms** | Get Field Names | PDFtk |
+| **Convert** | PDF to Images (PNG/JPG) | Ghostscript |
+| **Merge** | Combine multiple PDFs | Ghostscript |
+| **Split** | Extract pages or ranges | Ghostscript |
+| **Compress** | Optimize PDF file size | Ghostscript |
+| **Encrypt** | Password protection and permissions | Ghostscript |
+| **Watermark** | Overlay text on pages | Ghostscript |
+| **Rotation** | Rotate pages 90/180/270° | Ghostscript |
+| **Metadata** | Edit Title, Author, Keywords | Ghostscript |
+| **Flatten** | Burn forms into content | Ghostscript |
 
-```php
-$pdfLib = new PDFLib();
-$pdfLib->setPdfPath('my_document.pdf')
-       ->setOutputPath('output_images')
-       ->setImageFormat(PDFLib::$IMAGE_FORMAT_PNG) // or $IMAGE_FORMAT_JPEG
-       ->setDPI(300)
-       ->setPageRange(1, 5) // Optional: convert only pages 1-5
-       ->convert();
-```
-
-### 2. Create PDF from Images
-Combine a list of images into a single PDF file.
-
-```php
-$pdfLib = new PDFLib();
-$images = ['page1.jpg', 'page2.jpg', 'page3.jpg'];
-$pdfLib->makePDF('combined_output.pdf', $images);
-```
-
-### 3. Compress / Optimize PDF (New in v1.4)
-Reduce file size using Ghostscript's optimization presets.
+### Example: Advanced Chain
 
 ```php
-$pdfLib = new PDFLib();
-// Levels: screen (72dpi), ebook (150dpi), printer (300dpi), prepress (300dpi, color)
-$pdfLib->compress('large.pdf', 'optimized.pdf', PDFLib::$COMPRESSION_EBOOK);
+PDF::init()
+    ->from('source.pdf')
+    ->from('source.pdf')
+    ->encrypt('userPass', 'ownerPass', 'processed.pdf');
 ```
 
-### 4. Merge PDFs (New in v1.4)
-Combine multiple PDF documents into one.
-
-```php
-$pdfLib = new PDFLib();
-$files = ['part1.pdf', 'part2.pdf'];
-$pdfLib->merge($files, 'merged_complete.pdf');
+(Note: Current driver operations like `encrypt`, `rotate`, and `watermark` are immediate and require a destination path. Fully stateful chaining for these methods is planned for v3.1)
 ```
 
-### 5. Split PDF (New in v1.5)
-Extract a specific page or a range of pages.
+## 🤝 Contributing
 
-```php
-$pdfLib = new PDFLib();
+We welcome contributions! Please see [CONTRIBUTING](CONTRIBUTING.md) for details on our new coding standards (Pint, PHPStan) and architecture.
 
-// Extract just Page 1
-$pdfLib->split(1, 'page_one.pdf', 'source.pdf');
+## 📄 License
 
-// Extract Pages 1 to 5
-$pdfLib->split('1-5', 'chapter_one.pdf', 'source.pdf');
-```
+The MIT License (MIT). Please see [License File](LICENSE.md).
 
-### 6. Encrypt PDF (New in v1.5)
-Protect your PDF with passwords and disable printing/copying.
-
-```php
-$pdfLib = new PDFLib();
-// args: user_password, owner_password, output_path, input_path
-$pdfLib->encrypt('open123', 'admin123', 'protected_doc.pdf', 'source.pdf');
-```
-
-### 7. Watermarking (New in v1.5)
-Add a text watermark to every page (overlay).
-
-```php
-$pdfLib = new PDFLib();
-$pdfLib->addWatermarkText('CONFIDENTIAL', 'watermarked.pdf', 'source.pdf');
-```
-
-### 8. Thumbnail (New in v1.5)
-Generate a thumbnail image (JPEG) of the first page.
-
-```php
-$pdfLib = new PDFLib();
-// args: output_image, width (approx), input_pdf
-$pdfLib->createThumbnail('thumbnail.jpg', 200, 'source.pdf');
-```
-
-### 9. Version Conversion (New in v1.5)
-Convert a PDF to a specific PDF version (e.g., 1.4 for compatibility).
-
-```php
-$pdfLib = new PDFLib();
-$pdfLib->convertToVersion('1.4', 'compatible.pdf', 'source.pdf');
-```
-
-### 10. Metadata Management (New in v2.0)
-Set PDF properties like Title, Author, etc.
-
-```php
-$pdfLib = new PDFLib();
-$metadata = [
-    'Title' => 'Financial Report 2024',
-    'Author' => 'Finance Dept',
-    'Keywords' => 'finance, 2024, report'
-];
-$pdfLib->setMetadata($metadata, 'tagged.pdf', 'source.pdf');
-```
-
-### 11. Page Rotation (New in v2.0)
-Rotate all pages by 90, 180, or 270 degrees.
-
-```php
-$pdfLib = new PDFLib();
-// Rotate 90 degrees clockwise
-$pdfLib->rotateAll(90, 'rotated.pdf', 'source.pdf');
-```
-
-### 12. Form Flattening (New in v2.0)
-Burn interactive form fields into the page content (prevent editing).
-
-```php
-$pdfLib = new PDFLib();
-$pdfLib->flatten('flat.pdf', 'form.pdf');
-```
-
-### 13. PDF/A Conversion (New in v2.0)
-Convert to PDF/A-1b standard for archival (requires valid color profiles in Ghostscript).
-
-```php
-$pdfLib = new PDFLib();
-try {
-    $pdfLib->convertToPDFA('archive.pdf', 'source.pdf');
-} catch (Exception $e) {
-    echo "PDF/A conversion failed: " . $e->getMessage();
-}
-```
-
-### 14. OCR (Optical Character Recognition) (New in v2.0)
-Convert scanned PDFs to searchable text. **Requires Ghostscript >= 9.53 with Tesseract/OCR devices.**
-
-```php
-$pdfLib = new PDFLib();
-try {
-    // Language code: 'eng', 'deu', 'spa', etc.
-    $pdfLib->ocr('eng', 'searchable.pdf', 'scanned.pdf');
-} catch (Exception $e) {
-    echo "OCR failed (check if Tesseract is installed): " . $e->getMessage();
-}
-```
-
-## Configuration
-
-Fine-tune the behavior of the library:
-
-*   **`setNumberOfRenderingThreads(int $threads)`**: Speed up conversion by using multiple threads (Default: 4).
-*   **`setDPI(int $dpi)`**: Set output image resolution (Default: 300).
-*   **`setImageQuality(int $quality)`**: Set JPEG quality (0-100).
-*   **`setFilePrefix(string $prefix)`**: Custom prefix for output images (Default: "page-").
-
-```php
-$pdfLib->setNumberOfRenderingThreads(8)
-       ->setDPI(150)
-       ->setFilePrefix('slide-');
-```
-
-## Troubleshooting
-
-**Error: `**** Unable to open the initial device, quitting.`**
-*   **Cause**: Ghostscript cannot create temporary files due to permission issues.
-*   **Fix**: Ensure your web server (e.g., Apache/Nginx user) has write permissions to the system's temporary directory, or check your server logs for specific path errors.
-
-**Ghostscript Issues**
-*   Ensure the `gs` command is available in your system path.
-*   On Windows, ensure `gswin64c.exe` or `gswin32c.exe` is in your PATH.
-
-## Contributing
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Credits
-- [Imal Hasaranga Perera](https://github.com/imalhasaranga)
-- [All Contributors](../../contributors)
-
-## License
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+---
+*Initiative of [Treinetic (Pvt) Ltd](http://www.treinetic.com).*
