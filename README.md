@@ -155,7 +155,12 @@ PDF::init()
 (Note: Current driver operations like `encrypt`, `rotate`, and `watermark` are immediate and require a destination path. Fully stateful chaining for these methods is planned for v3.1)
 
 
+## 🔮 Roadmap
+
+Want to see what's coming next (v3.1+)? Check out our [Roadmap](ROADMAP.md).
+
 ## 🤝 Contributing
+
 
 We welcome contributions! Please see [CONTRIBUTING](CONTRIBUTING.md) for details on our new coding standards (Pint, PHPStan) and architecture.
 
