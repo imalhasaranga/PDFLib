@@ -14,10 +14,13 @@ Thank you for considering contributing to PDFLib! We welcome contributions from 
 
 PDFLib v3.0+ uses a **Driver Pattern**.
 - **`src/Contracts/DriverInterface.php`**: Defines the contract for all drivers.
-- **`src/Drivers/GhostscriptDriver.php`**: The default implementation using `symfony/process`.
+- **`src/Drivers/GhostscriptDriver.php`**: For manipulations (Merge, Split, Convert).
+- **`src/Drivers/ChromeHeadlessDriver.php`**: For HTML to PDF conversion.
+- **`src/Drivers/OpenSslDriver.php`**: For Digital Signatures.
+- **`src/Drivers/PdftkDriver.php`**: For Form Filling and flattening.
 - **`src/PDF.php`**: The modern fluent Facade.
 
-When contributing features, please ensure they are implemented in the `DriverInterface` and supported by the `GhostscriptDriver`.
+When contributing features, please ensure they are defined in `DriverInterface`. You may implement them in a specific driver (e.g., `GhostscriptDriver`) or multiple drivers if applicable. If a driver does not support a feature, it should throw `NotSupportedException`.
 
 ## Code Quality Standards
 
