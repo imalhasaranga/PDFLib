@@ -39,6 +39,24 @@ PDFLib v3.0 has been completely re-architected to be modular and driver-based, a
 composer require imal-h/pdf-box
 ```
 
+## ✨ Features
+
+| Feature | Description | Driver |
+| :--- | :--- | :--- |
+| **HTML to PDF** | Generate PDF from HTML/CSS | [Chrome](docs/drivers/chrome.md) |
+| **Digital Sign** | Sign PDFs with X.509 Certs | [OpenSSL](docs/drivers/openssl.md) |
+| **Fill Forms** | Fill AcroForms (FDF) | [PDFtk](docs/drivers/pdftk.md) |
+| **Inspect Forms** | Get Field Names | [PDFtk](docs/drivers/pdftk.md) |
+| **Convert** | PDF to Images (PNG/JPG) | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Merge** | Combine multiple PDFs | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Split** | Extract pages or ranges | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Compress** | Optimize PDF file size | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Encrypt** | Password protection and permissions | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Watermark** | Overlay text on pages | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Rotation** | Rotate pages 90/180/270° | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Metadata** | Edit Title, Author, Keywords | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Flatten** | Burn forms into content | Ghostscript |
+
 ## 📖 Usage
 
 ### HTML to PDF (New in v3.0)
@@ -73,7 +91,6 @@ PDF::init()
             'Location' => 'Colombo, LK',
             'Reason' => 'Digital Contract Signature'
         ]
-    ]);
     ]);
 ```
 
@@ -125,24 +142,6 @@ $pdfLib->setPdfPath("document.pdf")
        ->setOutputPath("output_folder")
        ->convert();
 ```
-
-## ✨ Features (Ghostscript Driver)
-
-| Feature | Description | Driver |
-| :--- | :--- | :--- |
-| **HTML to PDF** | Generate PDF from HTML/CSS | [Chrome](docs/drivers/chrome.md) |
-| **Digital Sign** | Sign PDFs with X.509 Certs | [OpenSSL](docs/drivers/openssl.md) |
-| **Fill Forms** | Fill AcroForms (FDF) | [PDFtk](docs/drivers/pdftk.md) |
-| **Inspect Forms** | Get Field Names | [PDFtk](docs/drivers/pdftk.md) |
-| **Convert** | PDF to Images (PNG/JPG) | [Ghostscript](docs/drivers/ghostscript.md) |
-| **Merge** | Combine multiple PDFs | [Ghostscript](docs/drivers/ghostscript.md) |
-| **Split** | Extract pages or ranges | [Ghostscript](docs/drivers/ghostscript.md) |
-| **Compress** | Optimize PDF file size | [Ghostscript](docs/drivers/ghostscript.md) |
-| **Encrypt** | Password protection and permissions | [Ghostscript](docs/drivers/ghostscript.md) |
-| **Watermark** | Overlay text on pages | [Ghostscript](docs/drivers/ghostscript.md) |
-| **Rotation** | Rotate pages 90/180/270° | [Ghostscript](docs/drivers/ghostscript.md) |
-| **Metadata** | Edit Title, Author, Keywords | [Ghostscript](docs/drivers/ghostscript.md) |
-| **Flatten** | Burn forms into content | Ghostscript |
 
 ### Example: Advanced Chain
 
