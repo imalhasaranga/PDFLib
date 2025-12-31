@@ -58,8 +58,19 @@ class PdftkDriver implements DriverInterface
         // Let's assume flatten by default or check config?
         // Plan didn't specify, but standard practice is flatten.
 
-        $flatten = true; // Default behavior
+        // $flatten = true; // Default behavior
+        // Since we always flatten, we can directly append it to the command logic later
+        // or just hardcode it. PHPStan complaining about "always true" check.
 
+        $command = [
+            $this->binaryPath,
+            $this->source,
+            'fill_form',
+            $fdfFile,
+            'output',
+            $destination,
+            'flatten' // Always flatten for now
+        ];
         $command = [
             $this->binaryPath,
             $this->source,
@@ -69,9 +80,8 @@ class PdftkDriver implements DriverInterface
             $destination
         ];
 
-        if ($flatten) {
-            $command[] = 'flatten';
-        }
+        // Flatten logic moved to command array definition
+
 
         try {
             $process = new Process($command);
