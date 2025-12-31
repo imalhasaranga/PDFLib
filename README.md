@@ -15,7 +15,7 @@ docker run --pull always -p 9090:80 treineticprojects/demo_opensource:latest
 
 PDFLib v3.0 has been completely re-architected to be modular and driver-based, allowing you to switch between powerful backends like Ghostscript, Chrome Headless (coming soon), and OpenSSL for different tasks, all under a single, beautiful fluent API.
 
-👉 **[Try the Interactive Demo](demo/README.md)**
+👉 **[Try the Interactive Demo](demo/README.md)** | 📚 **[Read the Documentation](docs/index.md)**
 
 ---
 

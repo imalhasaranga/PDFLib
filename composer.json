@@ -1,14 +1,17 @@
 {
     "name": "imal-h/pdf-box",
-    "description": "Current Release of PDFlib provide you methods to convert PDF to Images as well as Images to PDF.",
+    "description": "The most advanced, driver-based PDF manipulation library for PHP v3.0. Supports Ghostscript, Chrome Headless (HTML to PDF), OpenSSL (Signing), and PDFtk (Forms).",
     "keywords": [
-        "Imal hasaranga",
-        "PDFlib for Php",
-        "pdf to images",
-        "images to pdf",
-        "convert",
-        "php wrapper",
-        "GhostScript"
+        "pdf",
+        "php",
+        "manipulation",
+        "html-to-pdf",
+        "digital-signature",
+        "form-filling",
+        "ghostscript",
+        "pdftk",
+        "chrome-headless",
+        "driver-based"
     ],
     "homepage": "https://github.com/imalhasaranga/PDFLib.git",
     "license": "MIT",
