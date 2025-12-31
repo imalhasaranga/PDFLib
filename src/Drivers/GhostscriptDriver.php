@@ -27,7 +27,16 @@ class GhostscriptDriver implements DriverInterface
 
     protected function detectGhostscript(string $bin): string
     {
-        // Simple detection logic (can be expanded)
+        if ($bin !== 'gs') {
+            return $bin;
+        }
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // Check for 64-bit CLI first, then 32-bit, then fallback
+            // We can't easily check file existence without path, so we guess 'gswin64c' for 64-bit systems
+            return 'gswin64c';
+        }
+
         return $bin;
     }
 

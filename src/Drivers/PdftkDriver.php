@@ -16,7 +16,25 @@ class PdftkDriver implements DriverInterface
 
     public function __construct(string $binaryPath = 'pdftk')
     {
-        $this->binaryPath = $binaryPath;
+        $this->binaryPath = $this->detectPdftk($binaryPath);
+    }
+
+    protected function detectPdftk(string $bin): string
+    {
+        if ($bin !== 'pdftk') {
+            return $bin;
+        }
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // Check for pdftk server binary convention if needed.
+            // choco install pdftk-server often puts 'pdftk' in path, but sometimes 'pdftk.exe'
+            // Generally 'pdftk' works in CMD if in path, but consistent naming helps.
+            // Let's rely on 'pdftk' being in path for Windows as choco handles shims.
+            // But if we wanted to be safe:
+            return 'pdftk';
+        }
+
+        return $bin;
     }
 
     public function setSource(string $path): self
