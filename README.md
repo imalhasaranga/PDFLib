@@ -130,18 +130,18 @@ $pdfLib->setPdfPath("document.pdf")
 
 | Feature | Description | Driver |
 | :--- | :--- | :--- |
-| **HTML to PDF** | Generate PDF from HTML/CSS | Chrome |
-| **Digital Sign** | Sign PDFs with X.509 Certs | OpenSSL |
-| **Fill Forms** | Fill AcroForms (FDF) | PDFtk |
-| **Inspect Forms** | Get Field Names | PDFtk |
-| **Convert** | PDF to Images (PNG/JPG) | Ghostscript |
-| **Merge** | Combine multiple PDFs | Ghostscript |
-| **Split** | Extract pages or ranges | Ghostscript |
-| **Compress** | Optimize PDF file size | Ghostscript |
-| **Encrypt** | Password protection and permissions | Ghostscript |
-| **Watermark** | Overlay text on pages | Ghostscript |
-| **Rotation** | Rotate pages 90/180/270° | Ghostscript |
-| **Metadata** | Edit Title, Author, Keywords | Ghostscript |
+| **HTML to PDF** | Generate PDF from HTML/CSS | [Chrome](docs/drivers/chrome.md) |
+| **Digital Sign** | Sign PDFs with X.509 Certs | [OpenSSL](docs/drivers/openssl.md) |
+| **Fill Forms** | Fill AcroForms (FDF) | [PDFtk](docs/drivers/pdftk.md) |
+| **Inspect Forms** | Get Field Names | [PDFtk](docs/drivers/pdftk.md) |
+| **Convert** | PDF to Images (PNG/JPG) | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Merge** | Combine multiple PDFs | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Split** | Extract pages or ranges | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Compress** | Optimize PDF file size | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Encrypt** | Password protection and permissions | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Watermark** | Overlay text on pages | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Rotation** | Rotate pages 90/180/270° | [Ghostscript](docs/drivers/ghostscript.md) |
+| **Metadata** | Edit Title, Author, Keywords | [Ghostscript](docs/drivers/ghostscript.md) |
 | **Flatten** | Burn forms into content | Ghostscript |
 
 ### Example: Advanced Chain
