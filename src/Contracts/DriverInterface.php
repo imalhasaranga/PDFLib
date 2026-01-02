@@ -126,4 +126,9 @@ interface DriverInterface
      * Redact text from PDF (Draw black rectangle over text)
      */
     public function redact(string $text, string $destination): bool;
+
+    /**
+     * Get PDF Metadata
+     */
+    public function getMetadata(string $source): array;
 }

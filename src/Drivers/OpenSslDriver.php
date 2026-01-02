@@ -220,4 +220,9 @@ class OpenSslDriver implements DriverInterface
     {
         throw new NotSupportedException("OpenSslDriver does not support redaction.");
     }
+
+    public function getMetadata(string $source): array
+    {
+        throw new NotSupportedException("OpenSslDriver does not support metadata extraction.");
+    }
 }

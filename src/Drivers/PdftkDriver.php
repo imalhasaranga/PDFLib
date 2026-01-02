@@ -118,6 +118,28 @@ class PdftkDriver implements DriverInterface
     }
 
     /**
+     * Get PDF Metadata
+     */
+    public function getMetadata(string $source): array
+    {
+        if (!file_exists($source)) {
+            throw new \RuntimeException("Source file not found: " . $source);
+        }
+
+        $command = [$this->binaryPath, $source, 'dump_data'];
+
+        try {
+            $process = new Process($command);
+            $process->mustRun();
+            $output = $process->getOutput();
+
+            return $this->parsePdftkMetadata($output);
+        } catch (ProcessFailedException $e) {
+            throw new \RuntimeException("Pdftk failed to extract metadata: " . $e->getMessage());
+        }
+    }
+
+    /**
      * Get Form Fields
      */
     public function getFormFields(string $source): array
@@ -192,6 +214,49 @@ class PdftkDriver implements DriverInterface
         }
 
         return $fields;
+    }
+
+    private function parsePdftkMetadata(string $output): array
+    {
+        $metadata = [];
+        $lines = explode("\n", $output);
+        foreach ($lines as $line) {
+            $parts = explode(':', $line, 2);
+            if (count($parts) == 2) {
+                $key = trim($parts[0]);
+                $value = trim($parts[1]);
+                if (strpos($key, 'InfoKey') === 0) {
+                    // pdftk output: InfoKey: Title \n InfoValue: My Title
+                    // We need to look ahead? 
+                    // Actually pdftk output is:
+                    // InfoKey: Title
+                    // InfoValue: The Title
+                    // InfoKey: Author
+                    // InfoValue: Me
+                    // So we need stateful parsing.
+                } else {
+                    // Standard keys like NumberOfPages might be direct.
+                    $metadata[$key] = $value;
+                }
+            }
+        }
+
+        // Re-parse for InfoKey/Value pairs properly
+        $info = [];
+        $currentKey = null;
+        foreach ($lines as $line) {
+            if (strpos($line, 'InfoKey:') === 0) {
+                $currentKey = trim(substr($line, 8));
+            } elseif (strpos($line, 'InfoValue:') === 0 && $currentKey) {
+                $info[$currentKey] = trim(substr($line, 10));
+                $currentKey = null;
+            } elseif (strpos($line, ':') !== false) {
+                // Other global keys
+                [$k, $v] = explode(':', $line, 2);
+                $info[trim($k)] = trim($v);
+            }
+        }
+        return $info;
     }
 
     // --- Not Supported ---

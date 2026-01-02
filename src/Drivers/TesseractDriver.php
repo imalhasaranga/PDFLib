@@ -170,4 +170,8 @@ class TesseractDriver implements DriverInterface
     {
         throw new NotSupportedException();
     }
+    public function getMetadata(string $source): array
+    {
+        throw new NotSupportedException();
+    }
 }

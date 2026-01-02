@@ -260,6 +260,23 @@ class PDF
         return $this->driver->redact($text, $destination);
     }
 
+    /**
+     * Get Metadata
+     */
+    public function getMetadata(string $source = null): array
+    {
+        $target = $source ?? $this->originalSource;
+        if (!$target && isset($this->driver)) {
+            // Can't easily get source from driver if not exposed.
+            // Assuming user provides it or we stored it.
+            // We stored originalSource.
+        }
+        if (!$target) {
+            throw new \InvalidArgumentException("Source file required for metadata.");
+        }
+        return $this->driver->getMetadata($target);
+    }
+
     public function __call($name, $arguments)
     {
         return $this->driver->$name(...$arguments);

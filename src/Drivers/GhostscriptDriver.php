@@ -488,4 +488,28 @@ class GhostscriptDriver implements DriverInterface
         $this->runCommand($command);
         return file_exists($destination);
     }
+
+    public function getMetadata(string $source): array
+    {
+        // Use 'pdfinfo' from poppler
+        $process = new Process(['pdfinfo', $source]);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            // Fallback or throw?
+            // Maybe GS has a way?
+            // Since we used pdftotext for redaction, pdfinfo is likely here.
+            throw new \RuntimeException("Metadata extraction requires 'pdfinfo' (poppler-utils).");
+        }
+
+        $output = $process->getOutput();
+        $metadata = [];
+        foreach (explode("\n", $output) as $line) {
+            $parts = explode(':', $line, 2);
+            if (count($parts) === 2) {
+                $metadata[trim($parts[0])] = trim($parts[1]);
+            }
+        }
+        return $metadata;
+    }
 }

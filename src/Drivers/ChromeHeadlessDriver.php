@@ -162,4 +162,9 @@ class ChromeHeadlessDriver implements DriverInterface
     {
         throw new NotSupportedException("ChromeHeadlessDriver does not support redaction.");
     }
+
+    public function getMetadata(string $source): array
+    {
+        throw new NotSupportedException("ChromeHeadlessDriver does not support metadata extraction.");
+    }
 }
