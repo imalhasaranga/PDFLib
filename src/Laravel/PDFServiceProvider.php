@@ -39,8 +39,12 @@ class PDFServiceProvider extends ServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
+            $dest = function_exists('config_path')
+                ? config_path('pdflib.php')
+                : $this->app->basePath('config/pdflib.php');
+
             $this->publishes([
-                __DIR__ . '/../../config/pdflib.php' => config_path('pdflib.php'),
+                __DIR__ . '/../../config/pdflib.php' => $dest,
             ], 'pdflib-config');
         }
     }
