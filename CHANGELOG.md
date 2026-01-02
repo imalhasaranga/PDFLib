@@ -1,5 +1,10 @@
 # Changelog
 
+### [v3.1.4] - 2026-01-02
+- **Fixed:** Critical bug in `PdftkDriver::fillForm` where the command array was overwritten, causing form flattening to fail.
+- **Fixed:** `PdftkDriver::getFormFields` now correctly parses field types and options (dropdowns).
+- **Added:** Implemented `getNumberOfPages` for `PdftkDriver`.
+
 All Significant changes to `PDFlib` will be documented in here
 
 ### Page Range Conversion Bug Fix
