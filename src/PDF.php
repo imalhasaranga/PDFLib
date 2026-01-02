@@ -13,6 +13,9 @@ class PDF
     public const DRIVER_PDFTK = Drivers\PdftkDriver::class;
 
     protected DriverInterface $driver;
+    protected array $pipeline = [];
+    protected array $tempFiles = [];
+    protected string $originalSource = '';
 
     public function __construct(DriverInterface $driver)
     {
@@ -34,6 +37,7 @@ class PDF
 
     public function from(string $path): self
     {
+        $this->originalSource = $path;
         $this->driver->setSource($path);
         return $this;
     }
@@ -81,22 +85,107 @@ class PDF
         return $this->driver->compress($source, $destination);
     }
 
-    public function encrypt(string $userPassword, string $ownerPassword, string $destination): bool
+    public function rotate(int $degrees, string $destination = null): self|bool
     {
-        return $this->driver->encrypt($userPassword, $ownerPassword, $destination);
+        if ($destination) {
+            return $this->driver->rotate($degrees, $destination);
+        }
+        $this->pipeline[] = ['method' => 'rotate', 'args' => [$degrees]];
+        return $this;
+    }
+
+    public function watermark(string $text, string $destination = null): self|bool
+    {
+        if ($destination) {
+            return $this->driver->watermark($text, $destination);
+        }
+        $this->pipeline[] = ['method' => 'watermark', 'args' => [$text]];
+        return $this;
+    }
+
+    public function encrypt(string $userPassword, string $ownerPassword, string $destination = null): self|bool
+    {
+        if ($destination) {
+            return $this->driver->encrypt($userPassword, $ownerPassword, $destination);
+        }
+        $this->pipeline[] = ['method' => 'encrypt', 'args' => [$userPassword, $ownerPassword]];
+        return $this;
+    }
+
+    public function flatten(string $destination = null): self|bool
+    {
+        if ($destination) {
+            return $this->driver->flatten($destination);
+        }
+        $this->pipeline[] = ['method' => 'flatten', 'args' => []];
+        return $this;
     }
 
     /**
-     * Legacy method alias.
-     * In v3, use to()->convert() or direct methods.
+     * Execute the pipeline and save to destination
      */
     public function save(string $path): bool
     {
-        $this->driver->setOutput($path);
-        // Dispatch based on driver type or explicitly call convert?
-        // For legacy parity, save() was never explicitly defined in this Facade before I added it.
-        // Let's just return true to match 'success'.
+        if (empty($this->pipeline)) {
+            if (isset($this->driver)) {
+                // Copy original source to destination if no ops
+                if ($this->originalSource && file_exists($this->originalSource)) {
+                    return copy($this->originalSource, $path);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        $currentSource = $this->originalSource;
+
+        foreach ($this->pipeline as $index => $job) {
+            $isLast = $index === count($this->pipeline) - 1;
+            $targetPath = $isLast ? $path : $this->createTempFile();
+
+            // Set the source for the driver
+            $this->driver->setSource($currentSource);
+
+            // Execute the method
+            $args = array_merge($job['args'], [$targetPath]);
+            $method = $job['method'];
+
+            if (!method_exists($this->driver, $method)) {
+                throw new \BadMethodCallException("Driver does not support method: {$method}");
+            }
+
+            $result = $this->driver->$method(...$args);
+
+            if (!$result) {
+                $this->cleanup();
+                return false;
+            }
+
+            // If this wasn't the last step, update source for next step
+            if (!$isLast) {
+                $currentSource = $targetPath;
+                $this->tempFiles[] = $targetPath;
+            }
+        }
+
+        $this->cleanup();
         return true;
+    }
+
+    protected function createTempFile(): string
+    {
+        return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'pdflib_pipe_' . uniqid() . '.pdf';
+    }
+
+    protected function cleanup(): void
+    {
+        foreach ($this->tempFiles as $file) {
+            if (file_exists($file)) {
+                unlink($file);
+            }
+        }
+        $this->tempFiles = [];
+        $this->pipeline = [];
     }
 
     /**
