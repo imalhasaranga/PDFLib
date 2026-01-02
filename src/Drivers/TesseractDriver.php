@@ -79,8 +79,13 @@ class TesseractDriver implements DriverInterface
         }
 
         if (!$process->isSuccessful()) {
-            // Exit code 127 is standard for "command not found"
-            if ($process->getExitCode() === 127 || strpos($process->getErrorOutput(), 'not found') !== false) {
+            // Exit code 127 (Linux) or 'not recognized' (Windows)
+            $error = strtolower($process->getErrorOutput());
+            if (
+                $process->getExitCode() === 127 ||
+                strpos($error, 'not found') !== false ||
+                strpos($error, 'not recognized') !== false
+            ) {
                 throw new \RuntimeException("Tesseract not found.");
             }
             return false;
