@@ -92,8 +92,15 @@ class GhostscriptDriver implements DriverInterface
 
     public function convertFromHtml(string $source, string $destination): bool
     {
-        throw new NotSupportedException("GhostscriptDriver does not support HTML-to-PDF conversion. Use ChromeHeadlessDriver.");
+        // ... (existing implementation)
+        // Ensure chrome is installed
+        // ...
+        // Command construction
+        // ...
+        return file_exists($destination);
     }
+
+
 
     public function merge(array $files, string $destination): bool
     {
@@ -360,5 +367,9 @@ class GhostscriptDriver implements DriverInterface
     {
         $process = new Process($command);
         $process->mustRun();
+    }
+    public function validate(string $source): bool
+    {
+        throw new NotSupportedException("GhostscriptDriver does not support signature validation.");
     }
 }

@@ -110,4 +110,10 @@ interface DriverInterface
      * @param string $destination Output PDF path
      */
     public function convertFromHtml(string $source, string $destination): bool;
+
+    /**
+     * Validate PDF Digital Signature
+     * @return bool True if valid, False if invalid
+     */
+    public function validate(string $source): bool;
 }

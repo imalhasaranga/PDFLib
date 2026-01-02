@@ -147,4 +147,9 @@ class ChromeHeadlessDriver implements DriverInterface
     {
         throw new NotSupportedException("ChromeDriver does not support page counting.");
     }
+
+    public function validate(string $source): bool
+    {
+        throw new NotSupportedException("ChromeDriver does not support signature validation.");
+    }
 }

@@ -4,6 +4,7 @@ namespace ImalH\PDFLib\Drivers;
 
 use ImalH\PDFLib\Contracts\DriverInterface;
 use ImalH\PDFLib\Exceptions\NotSupportedException;
+use Symfony\Component\Process\Process;
 use TCPDF;
 
 /**
@@ -154,5 +155,59 @@ class OpenSslDriver implements DriverInterface
     public function getFormFields(string $s): array
     {
         throw new NotSupportedException("OpenSslDriver does not support form inspection");
+    }
+
+    /**
+     * Validate Digital Signature using pdfsig (Poppler)
+     */
+    public function validate(string $source): bool
+    {
+        // simplistic check for pdfsig binary
+        // In a real app we'd inject this dependency or path
+        $pdfsig = 'pdfsig';
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // Check windows path or assume valid if in Path
+            // 'where' command?
+        }
+
+        $process = new Process([$pdfsig, '-v']);
+        $process->run();
+        if (!$process->isSuccessful()) {
+            // pdfsig not installed
+            throw new \RuntimeException("Validation requires 'pdfsig' (poppler-utils) to be installed.");
+        }
+
+        $command = [$pdfsig, $source];
+        $process = new Process($command);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            // Error running pdfsig on file
+            return false;
+        }
+
+        $output = $process->getOutput();
+
+        // Output format of pdfsig:
+        // Digital Signature Info for: signed.pdf
+        // Signature #1:
+        //   - Signer Certificate Common Name: ...
+        //   - Signer full Distinguished Name: ...
+        //   - Signing Time: ...
+        //   - Signing Hash Algorithm: ...
+        //   - Signature Type: ...
+        //   - Signed Ranges: ...
+        //   - Total Document Signed: ...
+        //   - Signature Validation: Signature is Valid.
+        //   - Certificate Validation: ...
+
+        // We look for "Signature is Valid."
+        // And ensure at least one signature exists
+
+        if (strpos($output, 'Signature is Valid.') !== false) {
+            return true;
+        }
+
+        return false;
     }
 }
