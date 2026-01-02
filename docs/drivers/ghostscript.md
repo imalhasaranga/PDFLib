@@ -48,6 +48,29 @@ Optimize file size using Ghostscript's presets (`screen`, `ebook`, `printer`, `p
 $pdf->compress('heavy.pdf', 'light.pdf', 'ebook');
 ```
 
+### 5. Redaction
+Permanently blackout sensitive text using coordinate analysis (requires `poppler-utils` for text finding).
+
+```php
+$pdf->from('confidential.pdf')
+    ->redact('SecretCode', 'clean.pdf');
+```
+
+### 6. Metadata
+Read and Write PDF metadata (Title, Author, etc).
+
+```php
+// Get Metadata
+$meta = $pdf->getMetadata('doc.pdf');
+// Returns: ['Title' => 'My Doc', 'Author' => 'Imal']
+
+// Set Metadata
+$pdf->setMetadata([
+    'Title' => 'New Title',
+    'Author' => 'New Author'
+], 'updated.pdf');
+```
+
 ### Other Methods
 *   `rotate(int $degrees, string $dest)`: Rotate pages.
 *   `watermark(string $text, string $dest)`: Add text watermark.

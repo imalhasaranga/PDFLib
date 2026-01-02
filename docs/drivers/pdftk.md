@@ -22,6 +22,14 @@ print_r($fields);
 // Output: ['full_name', 'email', 'date', ...]
 ```
 
+## 2. Get Metadata
+Retrieve metadata using `dump_data`.
+
+```php
+$meta = $pdf->getMetadata('doc.pdf');
+print_r($meta);
+```
+
 ## 2. Fill Form
 Map your data to the field names.
 

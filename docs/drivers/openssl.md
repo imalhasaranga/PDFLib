@@ -28,6 +28,21 @@ $pdf->from('contract.pdf')
             ]
         ]
     );
+            ]
+        ]
+    );
+```
+
+## Validation (Verify Signatures)
+Check if a PDF is digitally signed and valid.
+
+```php
+$isValid = $pdf->validate('signed_contract.pdf');
+if ($isValid) {
+    echo "Signature is VALID";
+} else {
+    echo "Signature is INVALID or Modified";
+}
 ```
 
 ## Self-Signed vs Trusted
