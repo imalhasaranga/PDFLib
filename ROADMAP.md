@@ -4,56 +4,46 @@ This document outlines the future direction of **PDFLib**. We follow [Semantic V
 
 ---
 
-## ✅ Completed (v3.0 Alpha)
+## ✅ Completed (v3.1 Stable)
 
-The foundation has been laid with a modular, driver-based architecture.
+The v3.1 release (current stable) introduced advanced stateful operations, security, and major integrations.
 
-- [x] **Core Architecture**: `DriverInterface` and Factory Pattern.
-- [x] **Ghostscript Driver**: Robust manipulation (Convert, Merge, Split, Compress, Encrypt, Watermark).
-- [x] **Chrome Driver**: High-fidelity HTML-to-PDF generation.
-- [x] **OpenSSL Driver**: Digital Signatures (X.509).
-- [x] **PDFtk Driver**: Interactive Form Filling and Inspection.
-- [x] **Fluent API**: Modern `PDF::init()->...` syntax.
-- [x] **CI/CD**: Cross-platform testing (Ubuntu, Windows, macOS).
+- [x] **Stateful Chaining**: `rotate()->watermark()->save()` pipeline.
+- [x] **Laravel Wrapper**: Official `PDFServiceProvider` and `PDF` Facade.
+- [x] **Digital Signature Validation**: Verify X.509 signatures (`validate()`).
+- [x] **OCR Support**: Extract text via Tesseract (`ocr()`).
+- [x] **Redaction**: Coordinate-based text blackout (`redact()`).
+- [x] **Metadata**: Read/Write PDF metadata (`getMetadata()`).
+- [x] **Core Architecture**: `DriverInterface` with Ghostscript, OpenSSL, PDFtk, Chrome, Tesseract drivers.
 
 ---
 
-## 🔮 Upcoming (v3.1+)
+## 🔮 Upcoming (v4.0)
 
-### 3.1 Advanced Chaining & State
-*Goal: True stateful manipulation without intermediate file handling.*
+### Theme: Cloud & Enterprise Scalability
 
-- [ ] **Stateful Chaining**: Allow multiple operations in one chain without specifying intermediate paths.
-  ```php
-  PDF::from('doc.pdf')
-      ->rotate(90)     // In-memory/temp state
-      ->watermark('DRAFT')
-      ->save('final.pdf');
-  ```
-- [ ] **Smart Pipeline**: Optimize driver calls (e.g., combine multiple Ghostscript operations into a single command where possible).
+The next major version will focus on running PDFLib in serverless and distributed environments.
 
-### 3.2 Ecosystem & Wrappers
-*Goal: Making it easiest to use in frameworks.*
+#### 1. Cloud Drivers (AWS/S3)
+- [ ] Implement `S3Driver` to handle input/output directly from AWS S3 streams without local temp files if possible (using stream wrappers).
+- [ ] Support for AWS Lambda execution (Serverless PDF manipulation).
 
-- [ ] **Laravel Wrapper**: Official `pdf-lib-laravel` package.
-  - Facades (`PDF::...`)
-  - Config publishing
-  - Service Provider integration
-- [ ] **Digital Signature Validation**: Verify signatures and check validity (Green checkmark logic).
+#### 2. Asynchronous Processing
+- [ ] Integrate with Laravel Queues for background processing of heavy tasks (OCR, Compression).
+- [ ] Webhook callbacks for long-running jobs.
 
-### 3.3 New Drivers & Features
-*Goal: Expanding capabilities.*
+#### 3. Advanced Editing (FPDI Integration)
+- [ ] Deep integration with FPDI to allow:
+    - [ ] Template importing (Letterheads).
+    - [ ] Page rearrangement/deletion within PHP (no external binary needed).
+    - [ ] Advanced text overlay with native font embedding.
 
-- [ ] **OCR Support**: `TesseractDriver` for extracting text from scanned PDFs.
-- [ ] **Redaction**: Coordinate-based blackout/redaction for sensitive data.
-- [ ] **Metadata Extraction**: Unified API to read PDF metadata.
-- [ ] **Metadata Extraction**: Unified API to read PDF metadata.
+#### 4. HTML Generation Improvements
+- [ ] Integration with `spatie/browsershot` (Puppeteer) as a robust alternative to `ChromeHeadlessDriver`.
+- [ ] Support for complex CSS Paged Media features.
 
-### 3.4 Future (v3.2+)
-- [ ] **S3 / Cloud Storage Support**: Stream drivers directly to/from cloud storage adapters (Flysystem).
-
-### 4.0 Long Term
-- [ ] **Pure PHP Driver**: A native PHP implementation (like `fpdi` or `dompdf`) for environments where binaries cannot be installed.
+#### 5. Containerization
+- [ ] Official Docker Image `imalh/pdflib` pre-installed with `gs`, `pdftk`, `tesseract`, `poppler-utils`, `chrome`.
 
 ---
 
