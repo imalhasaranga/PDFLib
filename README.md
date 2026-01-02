@@ -5,7 +5,7 @@ Try out before you actually use it
 docker run --pull always -p 9090:80 treineticprojects/demo_opensource:latest
 ```
 
-# PDFLib v3.0 (Alpha)
+# PDFLib v3.1
 
 ![Issues](https://img.shields.io/github/issues/imalhasaranga/PDFLib.svg)
 [![Software License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
@@ -13,18 +13,27 @@ docker run --pull always -p 9090:80 treineticprojects/demo_opensource:latest
 
 **The most advanced, driver-based PDF manipulation library for PHP.**
 
-PDFLib v3.0 has been completely re-architected to be modular and driver-based, allowing you to switch between powerful backends like Ghostscript, Chrome Headless (coming soon), and OpenSSL for different tasks, all under a single, beautiful fluent API.
+PDFLib v3.1 is the mature, stable release of the new driver-based architecture. It allows you to switch between powerful backends like Ghostscript, PDFtk, OpenSSL, and Tesseract for different tasks, all under a single, beautiful fluent API.
 
 👉 **[Try the Interactive Demo](demo/README.md)** | 📚 **[Read the Documentation](docs/index.md)**
 
 ---
 
-## 🚀 What's New in v3.0?
+## 🛡️ Stability Guarantee (v4.0 Ready)
 
-- **Fluent API**: Modern, chainable interface (`PDF::init()->from()->to()->convert()`).
-- **Driver Support**: Decoupled architecture using `DriverInterface`. Default driver is `GhostscriptDriver`.
-- **PHP 8.1+**: Fully typed, strict, and modern codebase.
-- **Legacy Compatibility**: Full backward compatibility for v2.x code via a transparent Facade.
+**We take backward compatibility seriously.** 
+
+The v3.1 architecture introduces a strict separation between the API (Facade) and the Execution Logic (Drivers).
+*   **Zero Breaking Changes Promise**: This structure allows us to upgrade the underlying engine (e.g., adding Cloud/Async support in v4.0) **without** changing a single line of your application code.
+*   **Pipeline Pattern**: Operations like `rotate()` or `ocr()` are queued, decoupling your intent from immediate execution. Use PDFLib with confidence knowing the API is frozen and stable.
+
+## 🚀 What's New in v3.1?
+
+- **OCR Support**: Extract text from images and PDFs using Tesseract.
+- **Redaction**: Securely blackout sensitive text.
+- **Metadata**: Read/Write PDF metadata.
+- **Laravel Wrapper**: First-party ServiceProvider and Facade.
+- **Stateful Chaining**: Queue multiple operations (`->rotate()->watermark()->save()`).
 
 ## 📦 Requirements
 
@@ -45,6 +54,8 @@ composer require imal-h/pdf-box
 | :--- | :--- | :--- |
 | **HTML to PDF** | Generate PDF from HTML/CSS | [Chrome](docs/drivers/chrome.md) |
 | **Digital Sign** | Sign PDFs with X.509 Certs | [OpenSSL](docs/drivers/openssl.md) |
+| **OCR** | Extract text from PDF/Images | [Tesseract](docs/drivers/tesseract.md) |
+| **Redact** | Blackout sensitive text | [Ghostscript](docs/drivers/ghostscript.md) |
 | **Fill Forms** | Fill AcroForms (FDF) | [PDFtk](docs/drivers/pdftk.md) |
 | **Inspect Forms** | Get Field Names | [PDFtk](docs/drivers/pdftk.md) |
 | **Convert** | PDF to Images (PNG/JPG) | [Ghostscript](docs/drivers/ghostscript.md) |
@@ -96,8 +107,39 @@ PDF::init()
 
 > **Note:** If you use a self-signed certificate (like in testing), PDF viewers will show "Signature Validity Unknown". For a green "Trusted" checkmark, use a certificate issued by a recognized Certificate Authority (CA) or explicitly trust your self-signed certificate in the viewer's settings.
 
-### Interactive Forms (New in v3.0)
+### Laravel Integration
+Publish the config file:
+```bash
+php artisan vendor:publish --tag=pdflib-config
+```
 
+Use the Facade in your controllers:
+```php
+use ImalH\PDFLib\Laravel\Facades\PDF;
+
+// The driver is automatically configured from config/pdflib.php
+PDF::from('upload.pdf')->ocr('output.txt');
+```
+
+### OCR (New in v3.1)
+Extract text from scanned PDFs or images.
+```php
+PDF::init()
+    ->driver(PDF::DRIVER_TESSERACT)
+    ->from('scanned_doc.pdf') // Automatically converts PDF to Image internally
+    ->ocr('extracted_text');
+```
+
+### Redaction (New in v3.1)
+Permanently remove sensitive text.
+```php
+PDF::init()
+    ->driver(PDF::DRIVER_GHOSTSCRIPT)
+    ->from('invoice.pdf')
+    ->redact('Confidential', 'clean_invoice.pdf');
+```
+
+### Interactive Forms
 Fill PDF forms programmatically using `pdftk`.
 
 ```php
