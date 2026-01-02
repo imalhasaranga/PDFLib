@@ -157,4 +157,9 @@ class ChromeHeadlessDriver implements DriverInterface
     {
         throw new NotSupportedException("ChromeHeadlessDriver does not support OCR.");
     }
+
+    public function redact(string $text, string $destination): bool
+    {
+        throw new NotSupportedException("ChromeHeadlessDriver does not support redaction.");
+    }
 }

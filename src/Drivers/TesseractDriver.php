@@ -166,4 +166,8 @@ class TesseractDriver implements DriverInterface
     {
         throw new NotSupportedException();
     }
+    public function redact(string $text, string $destination): bool
+    {
+        throw new NotSupportedException();
+    }
 }

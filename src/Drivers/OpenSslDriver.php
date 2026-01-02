@@ -215,4 +215,9 @@ class OpenSslDriver implements DriverInterface
     {
         throw new NotSupportedException("OpenSslDriver does not support OCR.");
     }
+
+    public function redact(string $text, string $destination): bool
+    {
+        throw new NotSupportedException("OpenSslDriver does not support redaction.");
+    }
 }

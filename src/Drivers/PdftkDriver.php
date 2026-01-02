@@ -278,4 +278,9 @@ class PdftkDriver implements DriverInterface
     {
         throw new NotSupportedException("PdftkDriver does not support OCR.");
     }
+
+    public function redact(string $text, string $destination): bool
+    {
+        throw new NotSupportedException("PdftkDriver does not support redaction.");
+    }
 }

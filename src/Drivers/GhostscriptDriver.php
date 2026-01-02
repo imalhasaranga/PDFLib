@@ -377,4 +377,115 @@ class GhostscriptDriver implements DriverInterface
     {
         throw new NotSupportedException("GhostscriptDriver does not support OCR.");
     }
+
+    public function redact(string $text, string $destination): bool
+    {
+        // 1. Find coordinates using pdftotext
+        // Requirement: poppler-utils (pdftotext)
+        $process = new Process(['pdftotext', '-bbox-layout', $this->source, '-']);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException("Redaction requires 'pdftotext' (poppler-utils).");
+        }
+
+        $xmlOutput = $process->getOutput();
+        // Parse basic XML
+        // <word xMin="72.00" yMin="72.00" xMax="100.00" yMax="84.00">Text</word>
+
+        // We need to handle page height for coordinate conversion?
+        // pdftotext bbox structure: <page width="612.00" height="792.00"> ... </page>
+        // PostScript coords: 0,0 is bottom-left. 
+        // pdftotext usually: 0,0 is top-left (yMin increases downwards).
+
+        $rects = [];
+
+        // Simple regex parsing to avoid heavy XML parser deps if possible, or use SimpleXML
+        // Let's use SimpleXML, it's standard.
+        // Suppress errors for malformed output
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($xmlOutput);
+        if (!$xml) {
+            throw new \RuntimeException("Failed to parse pdftotext output.");
+        }
+
+        foreach ($xml->page as $page) {
+            $pageHeight = (float) $page['height'];
+            $pageWidth = (float) $page['width'];
+
+            foreach ($page->word as $word) {
+                if (strpos((string) $word, $text) !== false) {
+                    $xMin = (float) $word['xMin'];
+                    $yMin = (float) $word['yMin'];
+                    $xMax = (float) $word['xMax'];
+                    $yMax = (float) $word['yMax'];
+
+                    // Convert to PostScript Coords (Bottom-Left)
+                    // GS: x is same. y = pageHeight - yMax ?
+                    // pdftotext yMin is top edge?
+                    // Let's assume pdftotext Y originates top-left.
+                    // So rect bottom-left in PS: x = xMin, y = pageHeight - yMax.
+                    // rect width = xMax - xMin.
+                    // rect height = yMax - yMin.
+
+                    $rectX = $xMin;
+                    $rectY = $pageHeight - $yMax;
+                    $rectW = $xMax - $xMin;
+                    $rectH = $yMax - $yMin;
+
+                    $rects[] = [$rectX, $rectY, $rectW, $rectH];
+                }
+            }
+        }
+
+        if (empty($rects)) {
+            // Text not found, copy file or fail?
+            // Let's copy to represent "no redaction needed" success
+            return copy($this->source, $destination);
+        }
+
+        // 2. Generate PostScript
+        /*
+          /RedactRects [
+             [x y w h]
+             [x y w h]
+          ] def
+
+          /EndPage {
+             exch pop 2 ne {
+                gsave
+                0 0 0 setrgbcolor
+                RedactRects {
+                   aload pop rectfill
+                } forall
+                grestore
+             } if
+             true
+          } bind >> setpagedevice
+        */
+
+        // We need to inject the array.
+        $psArray = "[";
+        foreach ($rects as $r) {
+            $psArray .= " [{$r[0]} {$r[1]} {$r[2]} {$r[3]}]";
+        }
+        $psArray .= " ]";
+
+        $psCommand = "/RedactRects $psArray def << /EndPage { exch pop 2 ne { gsave 0 0 0 setrgbcolor RedactRects { aload pop rectfill } forall grestore } if true } bind >> setpagedevice";
+
+        $command = [
+            $this->gsBin,
+            '-sDEVICE=pdfwrite',
+            '-dNOPAUSE',
+            '-dQUIET',
+            '-dBATCH',
+            '-sOutputFile=' . $destination,
+            '-c',
+            $psCommand,
+            '-f',
+            $this->source
+        ];
+        $this->runCommand($command);
+        return file_exists($destination);
+    }
 }

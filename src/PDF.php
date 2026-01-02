@@ -252,6 +252,14 @@ class PDF
         return $this->driver->ocr($destination);
     }
 
+    /**
+     * Redact Text
+     */
+    public function redact(string $text, string $destination): bool
+    {
+        return $this->driver->redact($text, $destination);
+    }
+
     public function __call($name, $arguments)
     {
         return $this->driver->$name(...$arguments);

@@ -121,4 +121,9 @@ interface DriverInterface
      * Perform OCR and save text to destination
      */
     public function ocr(string $destination): bool;
+
+    /**
+     * Redact text from PDF (Draw black rectangle over text)
+     */
+    public function redact(string $text, string $destination): bool;
 }
