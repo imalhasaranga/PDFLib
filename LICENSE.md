@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 
-Copyright (c) 2015 imal hasaranga <imal.hasaranga@gmail.com>
+Copyright (c) 2015 Imal Hasaranga
 
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
