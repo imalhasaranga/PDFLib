@@ -42,6 +42,8 @@ The v3.1 architecture introduces a strict separation between the API (Facade) an
 *   **Google Chrome** or **Chromium** (for HTML to PDF)
 *   **pdftk** (PDF Toolkit) (for Form Filling)
 
+👉 **[See Installation Guide](docs/installation.md)** for detailed setup instructions on macOS, Ubuntu, and Windows.
+
 ## 🔧 Installation
 
 ```bash

@@ -1,72 +1,132 @@
-# Installation
+# Comprehensive Installation Guide
 
-## Requirements
+This guide details how to install the necessary system dependencies for PDFLib v3.1 on **macOS**, **Ubuntu/Debian**, and **Windows**.
 
-*   **PHP**: 8.1 or higher
-*   **Composer**
+## 1. PHP & Extensions
 
-### Driver Dependencies
-PDFLib acts as a bridge to powerful system binaries. You only need to install the tools for the features you intend to use.
-
-| feature | Driver | Requirement |
-| :--- | :--- | :--- |
-| **Manipulation** (Merge, Split, Convert) | `GhostscriptDriver` | **Ghostscript** (v9.16+) |
-| **HTML to PDF** | `ChromeHeadlessDriver` | **Google Chrome** or **Chromium** |
-| **Digital Signatures** | `OpenSslDriver` | **PHP OpenSSL** & `tecnickcom/tcpdf` |
-| **Form Filling** | `PdftkDriver` | **pdftk** (PDF Toolkit) |
-
----
-
-## 1. Install via Composer
-
-```bash
-composer require imal-h/pdf-box
-```
-
-## 2. Install System Binaries
+**Requirement**: PHP >= 8.1
 
 ### macOS (Homebrew)
 ```bash
-# Ghostscript
-brew install ghostscript
-
-# Chrome (usually already installed, or install Chromium)
-brew install --cask google-chrome
-
-# PDFtk
-brew install pdftk-java
+brew install php
 ```
 
 ### Ubuntu / Debian
 ```bash
-# Ghostscript
-sudo apt-get update
-sudo apt-get install ghostscript
-
-# Chrome (install stable)
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-sudo apt install ./google-chrome-stable_current_amd64.deb
-
-# PDFtk
-sudo apt-get install pdftk
+sudo apt update
+sudo apt install php8.1 php8.1-cli php8.1-mbstring php8.1-xml php8.1-zip
 ```
 
 ### Windows
-*   **Ghostscript**: Download installer from [ghostscript.com](https://www.ghostscript.com/download.html). Add `gswin64c.exe` to your PATH.
-*   **Chrome**: Standard installation.
-*   **PDFtk**: Download from [pdflabs.com](https://www.pdflabs.com/tools/pdftk-server/).
+1. Download the **Non-Thread Safe (NTS)** version from [windows.php.net](https://windows.php.net/download/).
+2. Extract to `C:\php`.
+3. Add `C:\php` to your System PATH environment variable.
 
 ---
 
-## 3. Configuration
+## 2. Driver Dependencies
 
-By default, PDFLib attempts to autodetect binaries in common paths. If your environment uses custom paths, pass them to the Driver constructor.
+You only need to install the tools for the drivers you intend to use.
+
+| Feature | Driver | Requirement |
+| :--- | :--- | :--- |
+| **Manipulation** | `GhostscriptDriver` | [Ghostscript](#21-ghostscript) |
+| **HTML to PDF** | `ChromeHeadlessDriver` | [Google Chrome](#22-google-chrome--chromium) |
+| **Form Filling** | `PdftkDriver` | [PDFtk](#23-pdftk-server) |
+| **OCR** | `TesseractDriver` | [Tesseract](#24-tesseract-ocr) |
+| **Signatures** | `OpenSslDriver` | OpenSSL (Built-in to PHP) |
+
+### 2.1 Ghostscript
+*Required for: Merge, Split, Convert, Compress, Flatten, Redact.*
+
+**Version**: 9.16 or higher
+
+#### macOS
+```bash
+brew install ghostscript
+```
+
+#### Ubuntu / Debian
+```bash
+sudo apt install ghostscript
+```
+
+#### Windows
+1. Download `Ghostscript AGPL Release` from [ghostscript.com](https://www.ghostscript.com/releases/gsdnld.html).
+2. Install the package.
+3. **Critical**: Add the `bin` and `lib` folders to your PATH (e.g., `C:\Program Files\gs\gs9.55.0\bin`).
+4. PDFLib looks for `gswin64c.exe` automatically.
+
+---
+
+### 2.2 Google Chrome / Chromium
+*Required for: HTML to PDF conversion.*
+
+#### macOS
+```bash
+brew install --cask google-chrome
+# OR
+brew install chromium
+```
+
+#### Ubuntu / Debian
+```bash
+# Install stable Chrome
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb
+```
+
+#### Windows
+Standard installation of Google Chrome is sufficient. PDFLib will auto-detect it in standard `Program Files` locations.
+
+---
+
+### 2.3 PDFtk Server
+*Required for: Form Filling and Inspection.*
+
+#### macOS
+```bash
+brew install pdftk-java
+```
+
+#### Ubuntu / Debian
+```bash
+sudo apt install pdftk
+```
+
+#### Windows
+1. Download **PDFtk Server** from [pdflabs.com](https://www.pdflabs.com/tools/pdftk-server/).
+2. Run the installer.
+3. Ensure "Add application to your system path" is checked during installation.
+
+---
+
+### 2.4 Tesseract OCR
+*Required for: Text Extraction (OCR).*
+
+#### macOS
+```bash
+brew install tesseract
+```
+
+#### Ubuntu / Debian
+```bash
+sudo apt install tesseract-ocr
+```
+
+#### Windows
+1. Download the installer from the [UB-Mannheim Tesseract Wiki](https://github.com/UB-Mannheim/tesseract/wiki).
+2. Install and add the install directory to your PATH.
+
+---
+
+## 3. Configuration (Optional)
+
+PDFLib tries to find these binaries automatically. If you have installed them in non-standard locations, you can explicitly configure paths in `config/pdflib.php` (for Laravel) or pass them to the Driver.
 
 ```php
-use ImalH\PDFLib\Drivers\GhostscriptDriver;
-use ImalH\PDFLib\PDF;
-
-// Custom Path Example
-$driver = new GhostscriptDriver('/custom/path/to/gs');
-$pdf = new PDF($driver);
+// Manual Driver Configuration
+$driver = new \ImalH\PDFLib\Drivers\GhostscriptDriver(
+    binaryPath: '/custom/path/to/gs'
+);
 ```
