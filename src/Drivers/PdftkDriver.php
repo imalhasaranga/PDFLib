@@ -185,16 +185,20 @@ class PdftkDriver implements DriverInterface
         $currentField = [];
 
         foreach ($lines as $line) {
-            if (strpos($line, '---') === 0) {
-                // End of previous field
-                if (isset($currentField['FieldName'])) {
-                    $fields[] = [
-                        'name' => $currentField['FieldName'],
-                        'type' => $currentField['FieldType'] ?? 'Unknown',
-                        'options' => $currentField['FieldStateOption'] ?? []
-                    ];
+            $line = trim($line); // robustness
+            if ($line === '' || $line === '---') {
+                // Explicit separator or empty line might indicate end? 
+                // Actually empty lines are common, so only --- is explicit.
+                if (strpos($line, '---') === 0) {
+                    if (isset($currentField['FieldName'])) {
+                        $fields[] = [
+                            'name' => $currentField['FieldName'],
+                            'type' => $currentField['FieldType'] ?? 'Unknown',
+                            'options' => $currentField['FieldStateOption'] ?? []
+                        ];
+                    }
+                    $currentField = [];
                 }
-                $currentField = [];
                 continue;
             }
 
@@ -202,6 +206,19 @@ class PdftkDriver implements DriverInterface
             if (count($parts) == 2) {
                 $key = trim($parts[0]);
                 $value = trim($parts[1]);
+
+                // Duplicate key detection
+                if (isset($currentField[$key]) && $key !== 'FieldStateOption') {
+                    // Implicit new field detected!
+                    if (isset($currentField['FieldName'])) {
+                        $fields[] = [
+                            'name' => $currentField['FieldName'],
+                            'type' => $currentField['FieldType'] ?? 'Unknown',
+                            'options' => $currentField['FieldStateOption'] ?? []
+                        ];
+                    }
+                    $currentField = [];
+                }
 
                 if ($key === 'FieldStateOption') {
                     if (!isset($currentField[$key])) {
