@@ -372,4 +372,9 @@ class GhostscriptDriver implements DriverInterface
     {
         throw new NotSupportedException("GhostscriptDriver does not support signature validation.");
     }
+
+    public function ocr(string $destination): bool
+    {
+        throw new NotSupportedException("GhostscriptDriver does not support OCR.");
+    }
 }

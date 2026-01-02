@@ -150,6 +150,11 @@ class ChromeHeadlessDriver implements DriverInterface
 
     public function validate(string $source): bool
     {
-        throw new NotSupportedException("ChromeDriver does not support signature validation.");
+        throw new NotSupportedException("ChromeHeadlessDriver does not support signature validation.");
+    }
+
+    public function ocr(string $destination): bool
+    {
+        throw new NotSupportedException("ChromeHeadlessDriver does not support OCR.");
     }
 }

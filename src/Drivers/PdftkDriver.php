@@ -273,4 +273,9 @@ class PdftkDriver implements DriverInterface
     {
         throw new NotSupportedException("PdftkDriver does not support signature validation.");
     }
+
+    public function ocr(string $destination): bool
+    {
+        throw new NotSupportedException("PdftkDriver does not support OCR.");
+    }
 }

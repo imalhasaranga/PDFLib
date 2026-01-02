@@ -210,4 +210,9 @@ class OpenSslDriver implements DriverInterface
 
         return false;
     }
+
+    public function ocr(string $destination): bool
+    {
+        throw new NotSupportedException("OpenSslDriver does not support OCR.");
+    }
 }

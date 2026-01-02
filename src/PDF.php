@@ -11,6 +11,7 @@ class PDF
     public const DRIVER_CHROME = Drivers\ChromeHeadlessDriver::class;
     public const DRIVER_OPENSSL = Drivers\OpenSslDriver::class;
     public const DRIVER_PDFTK = Drivers\PdftkDriver::class;
+    public const DRIVER_TESSERACT = Drivers\TesseractDriver::class;
 
     protected DriverInterface $driver;
     protected array $pipeline = [];
@@ -233,6 +234,22 @@ class PDF
         // Let's assume user passes source for inspection or we fail.
 
         throw new \InvalidArgumentException("Source path required for getFormFields");
+    }
+
+    /**
+     * Validate Digital Signature
+     */
+    public function validate(string $source): bool
+    {
+        return $this->driver->validate($source);
+    }
+
+    /**
+     * Perform OCR
+     */
+    public function ocr(string $destination): bool
+    {
+        return $this->driver->ocr($destination);
     }
 
     public function __call($name, $arguments)

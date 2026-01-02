@@ -116,4 +116,9 @@ interface DriverInterface
      * @return bool True if valid, False if invalid
      */
     public function validate(string $source): bool;
+
+    /**
+     * Perform OCR and save text to destination
+     */
+    public function ocr(string $destination): bool;
 }
