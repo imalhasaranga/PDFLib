@@ -47,6 +47,9 @@ The foundation has been laid with a modular, driver-based architecture.
 - [ ] **OCR Support**: `TesseractDriver` for extracting text from scanned PDFs.
 - [ ] **Redaction**: Coordinate-based blackout/redaction for sensitive data.
 - [ ] **Metadata Extraction**: Unified API to read PDF metadata.
+- [ ] **Metadata Extraction**: Unified API to read PDF metadata.
+
+### 3.4 Future (v3.2+)
 - [ ] **S3 / Cloud Storage Support**: Stream drivers directly to/from cloud storage adapters (Flysystem).
 
 ### 4.0 Long Term
