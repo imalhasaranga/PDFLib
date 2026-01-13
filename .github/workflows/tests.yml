@@ -37,13 +37,13 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y ghostscript pdftk
+        sudo apt-get install -y ghostscript pdftk poppler-utils
 
     # macOS
     - name: Install Dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew install ghostscript pdftk-java
+        brew install ghostscript pdftk-java poppler
 
     # Windows
     - name: Install Dependencies (Windows)
@@ -51,6 +51,7 @@ jobs:
       run: |
         choco install ghostscript --no-progress
         choco install pdftk-server --no-progress
+        choco install poppler --no-progress
         
         # Add Ghostscript to PATH
         $gsPath = Get-ChildItem "C:\Program Files\gs\*\bin" | Select-Object -ExpandProperty FullName -First 1
