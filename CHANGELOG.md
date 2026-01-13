@@ -1,6 +1,6 @@
 # Changelog
 
-### [v3.1.5] - 2026-01-13
+### [v3.1.6] - 2026-01-13
 - **Fixed:** Redaction logic now supports multi-word phrases (e.g., "Secret Code") by calculating union bounding boxes.
 - **Fixed:** Added `extra.laravel.providers` to `composer.json` for automatic Laravel package discovery.
 - **Fixed:** Robust binary detection for `ChromeHeadlessDriver` and `OpenSslDriver` on Windows/macOS/Linux.
