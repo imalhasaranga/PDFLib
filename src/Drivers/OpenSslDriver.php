@@ -166,8 +166,12 @@ class OpenSslDriver implements DriverInterface
         // In a real app we'd inject this dependency or path
         $pdfsig = 'pdfsig';
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            // Check windows path or assume valid if in Path
-            // 'where' command?
+            // Check if pdfsig is in path using 'where'
+            $process = new Process(['where', 'pdfsig']);
+            $process->run();
+            if ($process->isSuccessful()) {
+                $pdfsig = trim($process->getOutput());
+            }
         }
 
         $process = new Process([$pdfsig, '-v']);

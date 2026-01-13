@@ -1,0 +1,154 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * PDFLib Dependency Installer
+ * 
+ * This script detects the operating system and installs the necessary binary dependencies
+ * for PDFLib (Ghostscript, PDFtk, Tesseract, etc.) using the system's package manager.
+ */
+
+$dependencies = [
+    'ghostscript' => [
+        'name' => 'Ghostscript',
+        'brew' => 'ghostscript',
+        'apt' => 'ghostscript',
+        'choco' => 'ghostscript',
+        'test_cmd' => 'gs --version'
+    ],
+    'pdftk' => [
+        'name' => 'PDFtk',
+        'brew' => 'pdftk-java',
+        'apt' => 'pdftk',
+        'choco' => 'pdftk-server', // specific for command line
+        'test_cmd' => 'pdftk --version'
+    ],
+    'tesseract' => [
+        'name' => 'Tesseract OCR',
+        'brew' => 'tesseract',
+        'apt' => 'tesseract-ocr',
+        'choco' => 'tesseract',
+        'test_cmd' => 'tesseract --version'
+    ]
+];
+
+function logMsg($message, $type = 'INFO') {
+    $colors = [
+        'INFO' => "\033[36m", // Cyan
+        'SUCCESS' => "\033[32m", // Green
+        'ERROR' => "\033[31m", // Red
+        'WARNING' => "\033[33m", // Yellow
+        'RESET' => "\033[0m",
+    ];
+    echo "{$colors[$type]}[{$type}] {$message}{$colors['RESET']}" . PHP_EOL;
+}
+
+function isCommandAvailable($command) {
+    if (PHP_OS_FAMILY === 'Windows') {
+        exec("where $command 2>nul", $output, $returnVar);
+    } else {
+        exec("which $command 2>/dev/null", $output, $returnVar);
+    }
+    return $returnVar === 0;
+}
+
+function installMac($dependencies) {
+    if (!isCommandAvailable('brew')) {
+        logMsg("Homebrew not found. Please install Homebrew first: https://brew.sh/", 'ERROR');
+        exit(1);
+    }
+
+    logMsg("Detected macOS. Using Homebrew...");
+    
+    foreach ($dependencies as $key => $dep) {
+        if (isCommandAvailable(explode(' ', $dep['test_cmd'])[0])) {
+            logMsg("{$dep['name']} is already installed.", 'SUCCESS');
+            continue;
+        }
+
+        logMsg("Installing {$dep['name']}...");
+        passthru("brew install {$dep['brew']}", $returnVar);
+        
+        if ($returnVar !== 0) {
+            logMsg("Failed to install {$dep['name']}.", 'ERROR');
+        } else {
+            logMsg("{$dep['name']} installed successfully.", 'SUCCESS');
+        }
+    }
+}
+
+function installLinux($dependencies) {
+    // Detect package manager (apt only for now, can extend)
+    if (isCommandAvailable('apt-get')) {
+        logMsg("Detected Debian/Ubuntu. Using apt-get...");
+        
+        // Update first? Maybe optional or user might complain about speed. Let's just install.
+        
+        foreach ($dependencies as $key => $dep) {
+            if (isCommandAvailable(explode(' ', $dep['test_cmd'])[0])) {
+                logMsg("{$dep['name']} is already installed.", 'SUCCESS');
+                continue;
+            }
+
+            logMsg("Installing {$dep['name']} (requires sudo)...");
+            passthru("sudo apt-get install -y {$dep['apt']}", $returnVar);
+            
+            if ($returnVar !== 0) {
+                logMsg("Failed to install {$dep['name']}.", 'ERROR');
+            } else {
+                logMsg("{$dep['name']} installed successfully.", 'SUCCESS');
+            }
+        }
+    } else {
+        logMsg("Unsupported Linux package manager. Only apt-get is currently auto-supported.", 'ERROR');
+        logMsg("Please install the following manually: " . implode(', ', array_column($dependencies, 'name')), 'WARNING');
+    }
+}
+
+function installWindows($dependencies) {
+    if (!isCommandAvailable('choco')) {
+        logMsg("Chocolatey not found. Please install Chocolatey first: https://chocolatey.org/install", 'ERROR');
+        logMsg("Alternatively, install the dependencies manually.", 'WARNING');
+        exit(1);
+    }
+
+    logMsg("Detected Windows. Using Chocolatey...");
+
+    foreach ($dependencies as $key => $dep) {
+        if (isCommandAvailable(explode(' ', $dep['test_cmd'])[0])) {
+            logMsg("{$dep['name']} is installed.", 'INFO'); 
+            // Checking availability on Windows can be tricky with path updates, assuming 'where' worked.
+            continue;
+        }
+
+        logMsg("Installing {$dep['name']}...");
+        passthru("choco install {$dep['choco']} -y", $returnVar);
+
+        if ($returnVar !== 0) {
+            logMsg("Failed to install {$dep['name']}.", 'ERROR');
+        } else {
+            logMsg("{$dep['name']} installed successfully. You may need to restart your terminal.", 'SUCCESS');
+        }
+    }
+}
+
+// Main Execution Flow
+
+logMsg("Starting PDFLib dependency check...");
+
+switch (PHP_OS_FAMILY) {
+    case 'Darwin':
+        installMac($dependencies);
+        break;
+    case 'Linux':
+        installLinux($dependencies);
+        break;
+    case 'Windows':
+        installWindows($dependencies);
+        break;
+    default:
+        logMsg("Unsupported OS: " . PHP_OS_FAMILY, 'ERROR');
+        exit(1);
+}
+
+logMsg("Dependency check complete.", 'INFO');

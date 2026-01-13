@@ -46,6 +46,13 @@
         }
     },
     "autoload-dev": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ImalH\\PDFLib\\Laravel\\PDFServiceProvider"
+            ]
+        }
+    },
     "scripts": {
         "test": "vendor/bin/phpunit",
         "format": "vendor/bin/pint",

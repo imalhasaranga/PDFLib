@@ -381,97 +381,21 @@ class GhostscriptDriver implements DriverInterface
     public function redact(string $text, string $destination): bool
     {
         // 1. Find coordinates using pdftotext
-        // Requirement: poppler-utils (pdftotext)
-        $process = new Process(['pdftotext', '-bbox-layout', $this->source, '-']);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
+        $xmlOutput = $this->getPdfTextXml();
+        if (empty($xmlOutput)) {
             throw new \RuntimeException("Redaction requires 'pdftotext' (poppler-utils).");
         }
 
-        $xmlOutput = $process->getOutput();
-        // Parse basic XML
-        // <word xMin="72.00" yMin="72.00" xMax="100.00" yMax="84.00">Text</word>
-
-        // We need to handle page height for coordinate conversion?
-        // pdftotext bbox structure: <page width="612.00" height="792.00"> ... </page>
-        // PostScript coords: 0,0 is bottom-left. 
-        // pdftotext usually: 0,0 is top-left (yMin increases downwards).
-
-        $rects = [];
-
-        // Simple regex parsing to avoid heavy XML parser deps if possible, or use SimpleXML
-        // Let's use SimpleXML, it's standard.
-        // Suppress errors for malformed output
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($xmlOutput);
-        if (!$xml) {
-            throw new \RuntimeException("Failed to parse pdftotext output.");
-        }
-
-        foreach ($xml->page as $page) {
-            $pageHeight = (float) $page['height'];
-            $pageWidth = (float) $page['width'];
-
-            foreach ($page->word as $word) {
-                if (strpos((string) $word, $text) !== false) {
-                    $xMin = (float) $word['xMin'];
-                    $yMin = (float) $word['yMin'];
-                    $xMax = (float) $word['xMax'];
-                    $yMax = (float) $word['yMax'];
-
-                    // Convert to PostScript Coords (Bottom-Left)
-                    // GS: x is same. y = pageHeight - yMax ?
-                    // pdftotext yMin is top edge?
-                    // Let's assume pdftotext Y originates top-left.
-                    // So rect bottom-left in PS: x = xMin, y = pageHeight - yMax.
-                    // rect width = xMax - xMin.
-                    // rect height = yMax - yMin.
-
-                    $rectX = $xMin;
-                    $rectY = $pageHeight - $yMax;
-                    $rectW = $xMax - $xMin;
-                    $rectH = $yMax - $yMin;
-
-                    $rects[] = [$rectX, $rectY, $rectW, $rectH];
-                }
-            }
-        }
+        $rects = $this->findTextCoordinates($xmlOutput, $text);
 
         if (empty($rects)) {
             // Text not found, copy file or fail?
-            // Let's copy to represent "no redaction needed" success
             return copy($this->source, $destination);
         }
 
         // 2. Generate PostScript
-        /*
-          /RedactRects [
-             [x y w h]
-             [x y w h]
-          ] def
-
-          /EndPage {
-             exch pop 2 ne {
-                gsave
-                0 0 0 setrgbcolor
-                RedactRects {
-                   aload pop rectfill
-                } forall
-                grestore
-             } if
-             true
-          } bind >> setpagedevice
-        */
-
-        // We need to inject the array.
-        $psArray = "[";
-        foreach ($rects as $r) {
-            $psArray .= " [{$r[0]} {$r[1]} {$r[2]} {$r[3]}]";
-        }
-        $psArray .= " ]";
-
-        $psCommand = "/RedactRects $psArray def << /EndPage { exch pop 2 ne { gsave 0 0 0 setrgbcolor RedactRects { aload pop rectfill } forall grestore } if true } bind >> setpagedevice";
+        // ... (Logic extracted to helper)
+        $psCommand = $this->generateRedactionPostScript($rects);
 
         $command = [
             $this->gsBin,
@@ -511,5 +435,103 @@ class GhostscriptDriver implements DriverInterface
             }
         }
         return $metadata;
+    }
+
+    protected function getPdfTextXml(): string
+    {
+        $process = new Process(['pdftotext', '-bbox-layout', $this->source, '-']);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            return '';
+        }
+
+        return $process->getOutput();
+    }
+
+    protected function findTextCoordinates(string $xmlOutput, string $searchText): array
+    {
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($xmlOutput);
+        if (!$xml) {
+            throw new \RuntimeException("Failed to parse pdftotext output.");
+        }
+
+        $rects = [];
+        $searchWords = preg_split('/\s+/', trim($searchText));
+        $searchCount = count($searchWords);
+
+        if ($searchCount === 0) {
+            return [];
+        }
+
+        foreach ($xml->page as $page) {
+            $pageHeight = (float) $page['height'];
+            $words = [];
+
+            // Convert SimpleXMLElement to array for easier indexing
+            foreach ($page->word as $wordNode) {
+                $words[] = [
+                    'text' => (string) $wordNode,
+                    'xMin' => (float) $wordNode['xMin'],
+                    'yMin' => (float) $wordNode['yMin'],
+                    'xMax' => (float) $wordNode['xMax'],
+                    'yMax' => (float) $wordNode['yMax'],
+                ];
+            }
+
+            $wordCount = count($words);
+
+            for ($i = 0; $i < $wordCount; $i++) {
+                // Check ifmatch starts here
+                $matchFound = true;
+                $currentRects = [];
+
+                for ($j = 0; $j < $searchCount; $j++) {
+                    if (($i + $j) >= $wordCount || stripos($words[$i + $j]['text'], $searchWords[$j]) === false) {
+                        $matchFound = false;
+                        break;
+                    }
+                    $currentRects[] = $words[$i + $j];
+                }
+
+                if ($matchFound) {
+                    // Calculate Union Bounding Box for the phrase
+                    $minX = $currentRects[0]['xMin'];
+                    $maxX = $currentRects[0]['xMax'];
+                    $minY = $currentRects[0]['yMin'];
+                    $maxY = $currentRects[0]['yMax'];
+
+                    foreach ($currentRects as $w) {
+                        $minX = min($minX, $w['xMin']);
+                        $maxX = max($maxX, $w['xMax']);
+                        $minY = min($minY, $w['yMin']);
+                        $maxY = max($maxY, $w['yMax']);
+                    }
+
+                    // Convert to PostScript (Bottom-Left origin)
+                    // Rect = [x, y, w, h]
+                    $rectX = $minX;
+                    $rectY = $pageHeight - $maxY; // Flip Y
+                    $rectW = $maxX - $minX;
+                    $rectH = $maxY - $minY;
+
+                    $rects[] = [$rectX, $rectY, $rectW, $rectH];
+                }
+            }
+        }
+
+        return $rects;
+    }
+
+    protected function generateRedactionPostScript(array $rects): string
+    {
+        $psArray = "[";
+        foreach ($rects as $r) {
+            $psArray .= " [{$r[0]} {$r[1]} {$r[2]} {$r[3]}]";
+        }
+        $psArray .= " ]";
+
+        return "/RedactRects $psArray def << /EndPage { exch pop 2 ne { gsave 0 0 0 setrgbcolor RedactRects { aload pop rectfill } forall grestore } if true } bind >> setpagedevice";
     }
 }

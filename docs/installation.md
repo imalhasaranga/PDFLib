@@ -2,6 +2,22 @@
 
 This guide details how to install the necessary system dependencies for PDFLib v3.1 on **macOS**, **Ubuntu/Debian**, and **Windows**.
 
+## ⚡ Automated Installation (Recommended)
+
+For convenience, we provide a cross-platform script that automatically detects your OS and installs the required dependencies (Ghostscript, PDFtk, Tesseract) using your system's package manager.
+
+```bash
+./bin/install-dependencies
+```
+
+- **macOS**: Uses Homebrew
+- **Windows**: Uses Chocolatey
+- **Linux**: Uses Apt
+
+If you prefer to install dependencies manually, or need specific versions, please follow the detailed guides below.
+
+---
+
 ## 1. PHP & Extensions
 
 **Requirement**: PHP >= 8.1

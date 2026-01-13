@@ -23,7 +23,35 @@ class ChromeHeadlessDriver implements DriverInterface
 
     public function __construct(string $chromeBin = 'google-chrome')
     {
-        $this->chromeBin = $chromeBin;
+        $this->chromeBin = $this->detectChrome($chromeBin);
+    }
+
+    protected function detectChrome(string $bin): string
+    {
+        if ($bin !== 'google-chrome') {
+            return $bin;
+        }
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $paths = [
+                'C:\Program Files\Google\Chrome\Application\chrome.exe',
+                'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
+            ];
+            foreach ($paths as $path) {
+                if (file_exists($path))
+                    return $path;
+            }
+        } elseif (PHP_OS_FAMILY === 'Darwin') {
+            $paths = [
+                '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            ];
+            foreach ($paths as $path) {
+                if (file_exists($path))
+                    return $path;
+            }
+        }
+
+        return $bin;
     }
 
     public function setSource(string $path): self
