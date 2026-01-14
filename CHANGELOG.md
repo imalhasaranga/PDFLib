@@ -1,5 +1,9 @@
 # Changelog
 
+### [v3.1.8] - 2026-01-14
+- **Fixed:** Installation script now includes `poppler` (via Chocolatey) for Windows to ensure `pdfsig` and `pdftotext` are available.
+- **Fixed:** `OpenSslDriver` binary detection now correctly handles multi-line output from `where` command on Windows.
+
 ### [v3.1.7] - 2026-01-14
 - **Fixed:** `Convert to Image` silent failure by throwing exceptions on process error in `GhostscriptDriver`.
 - **Fixed:** `OCR` demo failure by adding language support and error handling in `TesseractDriver`.

@@ -29,10 +29,18 @@ $dependencies = [
         'apt' => 'tesseract-ocr',
         'choco' => 'tesseract',
         'test_cmd' => 'tesseract --version'
+    ],
+    'poppler' => [
+        'name' => 'Poppler Utils',
+        'brew' => 'poppler',
+        'apt' => 'poppler-utils',
+        'choco' => 'poppler', // Chocolatey package for Windows
+        'test_cmd' => 'pdftotext -v'
     ]
 ];
 
-function logMsg($message, $type = 'INFO') {
+function logMsg($message, $type = 'INFO')
+{
     $colors = [
         'INFO' => "\033[36m", // Cyan
         'SUCCESS' => "\033[32m", // Green
@@ -43,7 +51,8 @@ function logMsg($message, $type = 'INFO') {
     echo "{$colors[$type]}[{$type}] {$message}{$colors['RESET']}" . PHP_EOL;
 }
 
-function isCommandAvailable($command) {
+function isCommandAvailable($command)
+{
     if (PHP_OS_FAMILY === 'Windows') {
         exec("where $command 2>nul", $output, $returnVar);
     } else {
@@ -52,14 +61,15 @@ function isCommandAvailable($command) {
     return $returnVar === 0;
 }
 
-function installMac($dependencies) {
+function installMac($dependencies)
+{
     if (!isCommandAvailable('brew')) {
         logMsg("Homebrew not found. Please install Homebrew first: https://brew.sh/", 'ERROR');
         exit(1);
     }
 
     logMsg("Detected macOS. Using Homebrew...");
-    
+
     foreach ($dependencies as $key => $dep) {
         if (isCommandAvailable(explode(' ', $dep['test_cmd'])[0])) {
             logMsg("{$dep['name']} is already installed.", 'SUCCESS');
@@ -68,7 +78,7 @@ function installMac($dependencies) {
 
         logMsg("Installing {$dep['name']}...");
         passthru("brew install {$dep['brew']}", $returnVar);
-        
+
         if ($returnVar !== 0) {
             logMsg("Failed to install {$dep['name']}.", 'ERROR');
         } else {
@@ -77,13 +87,14 @@ function installMac($dependencies) {
     }
 }
 
-function installLinux($dependencies) {
+function installLinux($dependencies)
+{
     // Detect package manager (apt only for now, can extend)
     if (isCommandAvailable('apt-get')) {
         logMsg("Detected Debian/Ubuntu. Using apt-get...");
-        
+
         // Update first? Maybe optional or user might complain about speed. Let's just install.
-        
+
         foreach ($dependencies as $key => $dep) {
             if (isCommandAvailable(explode(' ', $dep['test_cmd'])[0])) {
                 logMsg("{$dep['name']} is already installed.", 'SUCCESS');
@@ -92,7 +103,7 @@ function installLinux($dependencies) {
 
             logMsg("Installing {$dep['name']} (requires sudo)...");
             passthru("sudo apt-get install -y {$dep['apt']}", $returnVar);
-            
+
             if ($returnVar !== 0) {
                 logMsg("Failed to install {$dep['name']}.", 'ERROR');
             } else {
@@ -105,7 +116,8 @@ function installLinux($dependencies) {
     }
 }
 
-function installWindows($dependencies) {
+function installWindows($dependencies)
+{
     if (!isCommandAvailable('choco')) {
         logMsg("Chocolatey not found. Please install Chocolatey first: https://chocolatey.org/install", 'ERROR');
         logMsg("Alternatively, install the dependencies manually.", 'WARNING');
@@ -116,7 +128,7 @@ function installWindows($dependencies) {
 
     foreach ($dependencies as $key => $dep) {
         if (isCommandAvailable(explode(' ', $dep['test_cmd'])[0])) {
-            logMsg("{$dep['name']} is installed.", 'INFO'); 
+            logMsg("{$dep['name']} is installed.", 'INFO');
             // Checking availability on Windows can be tricky with path updates, assuming 'where' worked.
             continue;
         }

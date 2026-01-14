@@ -170,7 +170,8 @@ class OpenSslDriver implements DriverInterface
             $process = new Process(['where', 'pdfsig']);
             $process->run();
             if ($process->isSuccessful()) {
-                $pdfsig = trim($process->getOutput());
+                $lines = explode("\n", trim($process->getOutput()));
+                $pdfsig = trim($lines[0]);
             }
         }
 
