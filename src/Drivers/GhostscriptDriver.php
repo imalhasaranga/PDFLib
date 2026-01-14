@@ -31,10 +31,44 @@ class GhostscriptDriver implements DriverInterface
             return $bin;
         }
 
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            // Check for 64-bit CLI first, then 32-bit, then fallback
-            // We can't easily check file existence without path, so we guess 'gswin64c' for 64-bit systems
-            return 'gswin64c';
+        if (PHP_OS_FAMILY === 'Windows') {
+            // Check for 64-bit CLI first, then 32-bit
+            $candidates = ['gswin64c.exe', 'gswin32c.exe', 'gs.exe'];
+
+            // Check in common usage paths first (PATH)
+            foreach ($candidates as $candidate) {
+                $process = new Process(['where', $candidate]);
+                $process->run();
+                if ($process->isSuccessful()) {
+                    return trim(explode("\n", $process->getOutput())[0]);
+                }
+            }
+
+            // Explicit Program Files check
+            $progFiles = [
+                'C:\Program Files\gs',
+                'C:\Program Files (x86)\gs',
+            ];
+
+            foreach ($progFiles as $progFile) {
+                if (is_dir($progFile)) {
+                    $dirs = glob($progFile . '\gs*');
+                    if ($dirs) {
+                        // Sort by version desc
+                        rsort($dirs);
+                        foreach ($dirs as $dir) {
+                            $binPath = $dir . '\bin\gswin64c.exe';
+                            if (file_exists($binPath))
+                                return $binPath;
+                            $binPath = $dir . '\bin\gswin32c.exe';
+                            if (file_exists($binPath))
+                                return $binPath;
+                        }
+                    }
+                }
+            }
+
+            return 'gswin64c'; // Fallback
         }
 
         return $bin;

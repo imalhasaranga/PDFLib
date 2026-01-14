@@ -17,7 +17,23 @@ function jsonResponse($data, $code = 200)
 {
     http_response_code($code);
     header('Content-Type: application/json');
-    echo json_encode($data);
+
+    $json = json_encode($data);
+
+    if ($json === false) {
+        $json = json_encode([
+            'success' => false,
+            'error' => 'JSON Encoding Error: ' . json_last_error_msg(),
+            'partial_data' => print_r($data, true)
+        ]);
+
+        // Final fallback if even error object fails (e.g. binary data in print_r)
+        if ($json === false) {
+            $json = '{"success":false,"error":"Critical JSON Encoding Failure"}';
+        }
+    }
+
+    echo $json;
     exit;
 }
 

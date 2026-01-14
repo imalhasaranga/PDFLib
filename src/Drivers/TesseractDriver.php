@@ -29,8 +29,13 @@ class TesseractDriver implements DriverInterface
         return $this;
     }
 
+    protected array $options = [
+        'language' => 'eng',
+    ];
+
     public function setOption(string $key, mixed $value): self
     {
+        $this->options[$key] = $value;
         return $this;
     }
 
@@ -40,7 +45,7 @@ class TesseractDriver implements DriverInterface
     public function ocr(string $destination): bool
     {
         // Tesseract appends .txt automatically usually.
-        // usage: tesseract input.pdf output_base
+        // usage: tesseract input.pdf output_base -l eng
 
         $outputBase = preg_replace('/\.txt$/i', '', $destination);
         $ocrSource = $this->source;
@@ -53,22 +58,27 @@ class TesseractDriver implements DriverInterface
             $tempImage = sys_get_temp_dir() . '/tess_temp_' . uniqid() . '.jpg';
 
             if (class_exists(\ImalH\PDFLib\Drivers\GhostscriptDriver::class)) {
-                $gs = new \ImalH\PDFLib\Drivers\GhostscriptDriver();
-                $gs->setSource($this->source);
-                $gs->setOption('resolution', 300); // High res for OCR
-                $gs->setOption('format', 'jpeg');
-                $gs->setOutput(sys_get_temp_dir());
+                try {
+                    $gs = new \ImalH\PDFLib\Drivers\GhostscriptDriver();
+                    $gs->setSource($this->source);
+                    $gs->setOption('resolution', 300); // High res for OCR
+                    $gs->setOption('format', 'jpeg');
+                    $gs->setOutput(sys_get_temp_dir());
 
-                // Use thumbnail to generate single high-res image of first page
-                $gs->thumbnail($tempImage, 2480);
+                    // Use thumbnail to generate single high-res image of first page
+                    $gs->thumbnail($tempImage, 2480);
 
-                if (file_exists($tempImage)) {
-                    $ocrSource = $tempImage;
+                    if (file_exists($tempImage)) {
+                        $ocrSource = $tempImage;
+                    }
+                } catch (\Exception $e) {
+                    // GS failed, try to let Tesseract read PDF directly (fallback)
+                    // Or log error? For now allow fallback
                 }
             }
         }
 
-        $command = [$this->bin, $ocrSource, $outputBase];
+        $command = [$this->bin, $ocrSource, $outputBase, '-l', $this->options['language']];
 
         $process = new Process($command);
         $process->run();
@@ -88,7 +98,7 @@ class TesseractDriver implements DriverInterface
             ) {
                 throw new \RuntimeException("Tesseract not found.");
             }
-            return false;
+            throw new \RuntimeException("Tesseract OCR Failed: " . $process->getErrorOutput());
         }
 
         // Tesseract adds .txt

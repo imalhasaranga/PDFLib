@@ -1,5 +1,11 @@
 # Changelog
 
+### [v3.1.7] - 2026-01-14
+- **Fixed:** `Convert to Image` silent failure by throwing exceptions on process error in `GhostscriptDriver`.
+- **Fixed:** `OCR` demo failure by adding language support and error handling in `TesseractDriver`.
+- **Fixed:** "Unexpected end of JSON" errors in demo API by hardening `jsonResponse` against UTF-8 encoding issues.
+- **Fixed:** Ghostscript binary detection logic refined for Windows/Docker.
+
 ### [v3.1.6] - 2026-01-13
 - **Fixed:** Redaction logic now supports multi-word phrases (e.g., "Secret Code") by calculating union bounding boxes.
 - **Fixed:** Added `extra.laravel.providers` to `composer.json` for automatic Laravel package discovery.
