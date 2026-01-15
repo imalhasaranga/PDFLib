@@ -1,5 +1,8 @@
 # Changelog
 
+### [v3.1.9] - 2026-01-15
+- **Cleanup:** Removed sensitive email information from `composer.json`.
+
 ### [v3.1.8] - 2026-01-14
 - **Fixed:** Installation script now includes `poppler` (via Chocolatey) for Windows to ensure `pdfsig` and `pdftotext` are available.
 - **Fixed:** `OpenSslDriver` binary detection now correctly handles multi-line output from `where` command on Windows.
