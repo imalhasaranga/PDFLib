@@ -8,6 +8,10 @@ use Symfony\Component\Process\Process;
 
 class TesseractDriver implements DriverInterface
 {
+    public function getPageDimensions(string $source, int $page): array
+    {
+        throw new NotSupportedException("TesseractDriver does not support page dimensions.");
+    }
     protected string $source;
     protected string $output;
     protected string $bin;

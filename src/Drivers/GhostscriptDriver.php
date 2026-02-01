@@ -9,6 +9,10 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class GhostscriptDriver implements DriverInterface
 {
+    public function getPageDimensions(string $source, int $page): array
+    {
+        throw new NotSupportedException("GhostscriptDriver does not support page dimensions yet (Planned Phase 2).");
+    }
     protected string $source;
     protected string $output;
     protected string $gsBin;

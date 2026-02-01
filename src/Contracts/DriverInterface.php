@@ -131,4 +131,9 @@ interface DriverInterface
      * Get PDF Metadata
      */
     public function getMetadata(string $source): array;
+    /**
+     * Get PDF Page Dimensions (Width, Height)
+     * @return array ['w' => float, 'h' => float]
+     */
+    public function getPageDimensions(string $source, int $page): array;
 }

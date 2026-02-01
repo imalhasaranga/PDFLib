@@ -3,3 +3,5 @@ vendor
 .agent
 issues.pdf
 issues-install.pdf
+output_signed_with_image.pdf
+.phpunit.result.cache

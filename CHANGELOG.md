@@ -1,4 +1,9 @@
 # Changelog
+### [v3.2.0] - 2026-02-01
+- **Added:** Support for visual signatures (images) in `OpenSslDriver::sign`.
+- **Added:** `getPageDimensions($page)` method to `DriverInterface` and `PDF` facade for retrieving page size.
+- **Changed:** `OpenSslDriver` now uses `setasign/fpdi` to import pages from existing PDFs instead of creating new documents.
+- **Dependency:** Added `setasign/fpdi` (^2.6) requirement.
 
 ### [v3.1.9] - 2026-01-15
 - **Cleanup:** Removed sensitive email information from `composer.json`.

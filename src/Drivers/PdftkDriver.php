@@ -9,6 +9,10 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class PdftkDriver implements DriverInterface
 {
+    public function getPageDimensions(string $source, int $page): array
+    {
+        throw new NotSupportedException("PdftkDriver does not support page dimensions.");
+    }
     protected string $source;
     protected string $output;
     protected array $config = [];

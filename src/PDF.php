@@ -277,6 +277,15 @@ class PDF
         return $this->driver->getMetadata($target);
     }
 
+    public function getPageDimensions(int $page, string $source = null): array
+    {
+        $target = $source ?? $this->originalSource;
+        if (!$target) {
+            throw new \InvalidArgumentException("Source file required for dimensions.");
+        }
+        return $this->driver->getPageDimensions($target, $page);
+    }
+
     public function __call($name, $arguments)
     {
         return $this->driver->$name(...$arguments);

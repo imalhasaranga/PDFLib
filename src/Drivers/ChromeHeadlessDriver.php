@@ -8,6 +8,10 @@ use Symfony\Component\Process\Process;
 
 class ChromeHeadlessDriver implements DriverInterface
 {
+    public function getPageDimensions(string $source, int $page): array
+    {
+        throw new NotSupportedException("ChromeHeadlessDriver does not support page dimensions.");
+    }
     protected string $chromeBin;
     protected string $source;
     protected string $output;

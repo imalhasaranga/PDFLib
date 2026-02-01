@@ -39,8 +39,11 @@ class OpenSslDriverTest extends TestCase
         openssl_x509_export_to_file($x509, self::$_CERT_FILE);
         openssl_pkey_export_to_file($privkey, self::$_KEY_FILE);
 
-        // Dummy Source
-        file_put_contents(self::$_DATA_FOLDER . '/dummy.pdf', 'dummy content');
+        // Generate Valid PDF for Source
+        $pdf = new \TCPDF();
+        $pdf->AddPage();
+        $pdf->Write(0, 'Source PDF Content');
+        $pdf->Output(self::$_DATA_FOLDER . '/dummy.pdf', 'F');
     }
 
     public static function tearDownAfterClass(): void

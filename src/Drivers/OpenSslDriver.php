@@ -5,6 +5,7 @@ namespace ImalH\PDFLib\Drivers;
 use ImalH\PDFLib\Contracts\DriverInterface;
 use ImalH\PDFLib\Exceptions\NotSupportedException;
 use Symfony\Component\Process\Process;
+use setasign\Fpdi\Tcpdf\Fpdi;
 use TCPDF;
 
 /**
@@ -37,16 +38,20 @@ class OpenSslDriver implements DriverInterface
     }
 
     /**
-     * Sign PDF using TCPDF
+     * Sign PDF using TCPDF/FPDI
      */
     public function sign(string $certificate, string $privateKey, string $destination, array $options = []): bool
     {
+        if (!class_exists('setasign\Fpdi\Tcpdf\Fpdi')) {
+            throw new \RuntimeException("FPDI is required. Run 'composer require setasign/fpdi'.");
+        }
+
         if (!class_exists('TCPDF')) {
             throw new \RuntimeException("TCPDF is required. Run 'composer require tecnickcom/tcpdf'.");
         }
 
-        // Create new TCPDF instance
-        $pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+        // Create new FPDI instance
+        $pdf = new Fpdi(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
         // Set document information
         $pdf->SetCreator('PDFLib v3.0');
@@ -54,9 +59,6 @@ class OpenSslDriver implements DriverInterface
         $pdf->SetTitle('Digitally Signed Document');
 
         // Configure Signature
-        // TCPDF expects the certificate content, not just path in some versions, but standard usage is:
-        // $pdf->setSignature($certificate, $privateKey, $password, '', 2, $info);
-
         $password = $options['password'] ?? '';
         $info = $options['info'] ?? [];
 
@@ -66,27 +68,63 @@ class OpenSslDriver implements DriverInterface
         if (!file_exists($privateKey))
             throw new \RuntimeException("Key not found: $privateKey");
 
-        // Read file contents as TCPDF often needs the actual data stream
+        // Read file contents
         $certContent = 'file://' . realpath($certificate);
         $keyContent = 'file://' . realpath($privateKey);
 
         $pdf->setSignature($certContent, $keyContent, $password, '', 2, $info);
 
-        // Import content from source? 
-        // Without FPDI, we can't easily import existing PDF pages.
-        // For this Phase 2b MVP, if we can't import, we'll add a visual note.
-        // "Original Content Placeholder"
-        // Real-world usage MUST require FPDI.
+        // Prepare Image Options
+        $img = $options['image'] ?? null;
+        $x = $options['x'] ?? 15;
+        $y = $options['y'] ?? 15;
+        $w = $options['w'] ?? 50;
+        $h = $options['h'] ?? 15;
+        $userPage = $options['page'] ?? null;
 
-        $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 12);
-        $pdf->Write(0, 'This document has been digitally signed via PDFLib OpenSslDriver.');
-        $pdf->Ln(10);
-        $pdf->Write(0, 'Note: Import of existing PDF content requires FPDI (Phase 3).');
+        // Import content from source using FPDI
+        $pageCount = 0;
+        if (file_exists($this->source)) {
+            $pageCount = $pdf->setSourceFile($this->source);
 
-        // Visible Signature
-        $pdf->setSignatureAppearance(180, 60, 15, 15);
-        $pdf->addEmptySignatureAppearance(180, 80, 15, 15);
+            // Determine target page
+            // If user provided page, use it. Default to last page.
+            $targetPage = $userPage ?? $pageCount;
+            if ($targetPage < 1)
+                $targetPage = 1;
+
+            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                $templateId = $pdf->importPage($pageNo);
+                $size = $pdf->getTemplateSize($templateId);
+
+                // Add page with original size/orientation
+                $orientation = $size['width'] > $size['height'] ? 'L' : 'P';
+                $pdf->AddPage($orientation, [$size['width'], $size['height']]);
+                $pdf->useTemplate($templateId);
+
+                // Inject Signature if this is the target page
+                if ($pageNo == $targetPage) {
+                    if ($img && file_exists($img)) {
+                        $pdf->Image($img, $x, $y, $w, $h);
+                        $pdf->setSignatureAppearance($x, $y, $w, $h, $pageNo);
+                    } else {
+                        // Default appearance
+                        $pdf->setSignatureAppearance(180, 60, 15, 15, $pageNo);
+                    }
+                }
+            }
+        } else {
+            // Fallback if no source (create blank page)
+            $pdf->AddPage();
+            $pdf->Write(0, 'Digitally signed via PDFLib (No source content).');
+            // Add signature to this single page
+            if ($img && file_exists($img)) {
+                $pdf->Image($img, $x, $y, $w, $h);
+                $pdf->setSignatureAppearance($x, $y, $w, $h, 1);
+            } else {
+                $pdf->setSignatureAppearance(180, 60, 15, 15, 1);
+            }
+        }
 
         // Output
         $pdf->Output($destination, 'F');
@@ -229,5 +267,27 @@ class OpenSslDriver implements DriverInterface
     public function getMetadata(string $source): array
     {
         throw new NotSupportedException("OpenSslDriver does not support metadata extraction.");
+    }
+
+    public function getPageDimensions(string $source, int $page): array
+    {
+        if (!class_exists('setasign\Fpdi\Tcpdf\Fpdi')) {
+            throw new \RuntimeException("FPDI is required. Run 'composer require setasign/fpdi'.");
+        }
+
+        $pdf = new Fpdi();
+        $pageCount = $pdf->setSourceFile($source);
+
+        if ($page > $pageCount || $page < 1) {
+            throw new \InvalidArgumentException("Page $page not found. Document has $pageCount pages.");
+        }
+
+        $templateId = $pdf->importPage($page);
+        $size = $pdf->getTemplateSize($templateId);
+
+        return [
+            'w' => $size['width'],
+            'h' => $size['height']
+        ];
     }
 }
