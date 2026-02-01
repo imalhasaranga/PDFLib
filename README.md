@@ -105,7 +105,14 @@ PDF::init()
             'Name' => 'John Doe',
             'Location' => 'Colombo, LK',
             'Reason' => 'Digital Contract Signature'
-        ]
+        ],
+        // New in v3.2: Visual Signature with Relative Positioning
+        'image' => 'signature.png',
+        'page' => 1,
+        'x' => ($pdf->getPageDimensions(1)['w'] - 60) / 2, // Center X
+        'y' => 250,
+        'w' => 60,
+        'h' => 30
     ]);
 ```
 
